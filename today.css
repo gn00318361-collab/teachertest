@@ -1,0 +1,267 @@
+:root {
+  --qxes-blue: #235f9f;
+  --qxes-ink: #172033;
+  --qxes-muted: #657084;
+  --qxes-line: #d9e2ef;
+  --qxes-bg: #f4f7fb;
+  --qxes-yellow: #fff4d7;
+  --qxes-green: #1f7a5b;
+  --qxes-red: #b42318;
+}
+
+body {
+  min-height: 100vh;
+  color: var(--qxes-ink);
+  background: var(--qxes-bg);
+  font-family: "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif;
+}
+
+.hero-banner {
+  color: #ffffff;
+  padding: 22px 0;
+  background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+  border-radius: 0 0 15px 15px;
+}
+
+.hero-banner h1 {
+  font-size: clamp(28px, 4vw, 42px);
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+.eyebrow {
+  color: var(--qxes-blue);
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.view-panel {
+  display: none;
+}
+
+.view-panel.active {
+  display: block;
+}
+
+.view-switch {
+  border: 1px solid var(--qxes-line);
+  border-radius: 8px;
+}
+
+.time-banner {
+  border-radius: 8px;
+}
+
+.job-card-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.job-card,
+.judge-task-card,
+.admin-card {
+  border: 1px solid var(--qxes-line);
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 10px 28px rgba(25, 37, 58, 0.08);
+}
+
+.job-card {
+  min-height: 210px;
+  padding: 18px;
+  border-left: 5px solid #3b82f6;
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+.job-card:hover {
+  transform: translateY(-2px);
+}
+
+.job-card.closed {
+  background: #e5e7eb;
+  color: #667085;
+  opacity: 0.68;
+  border-left-color: #9ca3af;
+}
+
+.job-card.closed .closed-message {
+  color: var(--qxes-red);
+  font-size: 20px;
+  font-weight: 900;
+}
+
+.waiting-room {
+  display: inline-flex;
+  padding: 4px 10px;
+  border-radius: 999px;
+  color: #7a5a00;
+  background: var(--qxes-yellow);
+  font-weight: 900;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: #eef2f7;
+  color: var(--qxes-muted);
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.status-pill.active {
+  background: #fff4d7;
+  color: #9a6700;
+}
+
+.status-pill.done,
+.ready-pill {
+  background: #e6f6ef;
+  color: var(--qxes-green);
+}
+
+.status-pill.closed {
+  background: #fff0ee;
+  color: var(--qxes-red);
+}
+
+.sequence-box {
+  margin: 12px 0 14px;
+  overflow: hidden;
+  border: 1px solid #cbd7e8;
+  border-radius: 8px;
+  background: #f8fbff;
+}
+
+.sequence-title {
+  padding: 8px 10px;
+  color: #193b68;
+  background: #eaf2ff;
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.sequence-table {
+  width: 100%;
+  margin: 0;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.sequence-table th,
+.sequence-table td {
+  padding: 7px 8px;
+  border-top: 1px solid #d8e3f2;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.sequence-table th {
+  color: #3b4a62;
+  background: #f2f6fc;
+  font-weight: 900;
+}
+
+.sequence-table td:first-child {
+  width: 72px;
+  color: #1d4e89;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.sequence-empty {
+  margin: 10px 0 12px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  color: #7a5a00;
+  background: var(--qxes-yellow);
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.sequence-slot-row + .sequence-slot-row {
+  margin-top: 3px;
+}
+
+.judge-task-card {
+  padding: 18px;
+}
+
+.candidate-list {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.candidate-list li {
+  margin-bottom: 4px;
+}
+
+.admin-stack {
+  display: grid;
+  gap: 16px;
+}
+
+.admin-card {
+  padding: 18px;
+}
+
+.admin-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 16px;
+}
+
+.admin-field-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.checklist-box {
+  display: grid;
+  gap: 9px;
+}
+
+.check-row {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  padding: 9px 10px;
+  border: 1px solid var(--qxes-line);
+  border-radius: 8px;
+  background: #f9fbfe;
+}
+
+.check-row input {
+  margin-top: 4px;
+}
+
+textarea {
+  min-height: 92px;
+  resize: vertical;
+}
+
+.readonly-help {
+  color: var(--qxes-muted);
+  font-size: 14px;
+}
+
+@media (max-width: 1200px) {
+  .job-card-grid {
+    grid-template-columns: repeat(2, minmax(260px, 1fr));
+  }
+
+  .admin-grid,
+  .admin-field-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 680px) {
+  .job-card-grid {
+    grid-template-columns: 1fr;
+  }
+}
