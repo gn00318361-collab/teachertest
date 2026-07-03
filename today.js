@@ -3,7 +3,11 @@ const ROOMS_KEY = "qxes-subteacher-rooms";
 
 const statusOptions = ["未招滿", "第1招錄取", "第2招錄取", "第3招錄取", "已額滿截止"];
 const judgeProgress = ["未開始", "評分中", "已繳交評分表"];
-const timeSlots = ["09:00-09:25", "09:25-09:50", "09:50-10:15", "10:30-10:55", "10:55-11:20", "11:20-11:45", "11:45-12:10"];
+const preciseTimeSlotSets = {
+  full: ["09:00-09:25", "09:25-09:50", "09:50-10:15", "10:30-10:55", "10:55-11:20", "11:20-11:45", "11:45-12:10"],
+  firstHalf: ["09:00-09:25", "09:25-09:50", "09:50-10:15", "10:15-10:40"],
+  secondHalf: ["10:40-11:05", "11:05-11:30", "11:30-11:55"],
+};
 const checklistLabels = {
   desks: "桌椅設備就位（評審桌椅、計時器、標示牌）",
   forms: "評分表件就位（口試/試教評分表、簽章表）",
@@ -291,11 +295,24 @@ function buildSequenceSlots(job) {
   });
 }
 
+function getPreciseTimeSlots(job) {
+  if (job.dateKey !== "7/8") return buildSequenceSlots(job).map((slot) => slot.time.replace(/\s/g, ""));
+  if (job.id === "0708_room_1_subject_1") return preciseTimeSlotSets.full;
+
+  const secondHalfIds = ["0708_room_2_subject_c", "0708_room_3_subject_2", "0708_room_4_subject_2"];
+  if (secondHalfIds.includes(job.id)) return preciseTimeSlotSets.secondHalf;
+
+  const start = minutesFromTime(job.time);
+  if (start !== null && start >= minutesFromTime("10:40")) return preciseTimeSlotSets.secondHalf;
+  return preciseTimeSlotSets.firstHalf;
+}
+
 function sequenceSlotsTable(job, options = {}) {
+  const slots = getPreciseTimeSlots(job);
   return `
     <div class="mt-2 mb-3 p-2 bg-light rounded border">
       <small class="fw-bold d-block mb-1 text-secondary">⏱️ 考生順序精準時間：</small>
-      ${timeSlots.map((slot, index) => `
+      ${slots.map((slot, index) => `
         <div class="d-flex justify-content-between gap-3 text-muted sequence-slot-row" style="font-size: 0.85rem;">
           <span>第 ${index + 1} 號考生</span>
           <span class="font-monospace fw-semibold text-dark">${escapeHtml(slot)}</span>
