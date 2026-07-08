@@ -1,4 +1,4 @@
-const STORAGE_KEY = "qxes-subteacher-three-views";
+const STORAGE_KEY = "qxes-subteacher-three-views-1150708-split-real";
 const ROOMS_KEY = "qxes-subteacher-rooms";
 
 const statusOptions = ["未招滿", "第1招錄取", "第2招錄取", "第3招錄取", "已額滿截止"];
@@ -102,46 +102,54 @@ function loadRoomSchedules() {
 
 function finalJuly8Schedule() {
   const checklist = { desks: false, forms: false, lessonPlans: false, staff: false };
+  const rows = [
+    { no: "01", name: "藍婷", subject: "一般代理-導師", vacancy: "代理-實缺", teachScope: "導師試教，依甄試簡章及現場公告辦理", oralScope: "導師職務口試，依甄試簡章及現場公告辦理" },
+    { no: "02", name: "陳政輝", subject: "一般代理-體育科任", vacancy: "代理-實缺", teachScope: "體育科任試教，依甄試簡章及現場公告辦理", oralScope: "體育科任職務口試，依甄試簡章及現場公告辦理" },
+    { no: "03", name: "吳姿慧", subject: "鐘點教師-自然", vacancy: "鐘點教師", teachScope: "自然科試教，依甄試簡章及現場公告辦理", oralScope: "自然鐘點教師口試，依甄試簡章及現場公告辦理" },
+    { no: "04", name: "蘇于榕", subject: "鐘點教師-閩南語", vacancy: "鐘點教師", teachScope: "閩南語試教，依甄試簡章及現場公告辦理", oralScope: "閩南語鐘點教師口試，依甄試簡章及現場公告辦理" },
+    { no: "05", name: "倪月如", subject: "教支人員-客語", vacancy: "教支人員", teachScope: "客語教學演示，依甄試簡章及現場公告辦理", oralScope: "客語教支人員口試，依甄試簡章及現場公告辦理" },
+    { no: "06", name: "古安富", subject: "教支人員-排灣族語", vacancy: "教支人員", teachScope: "排灣族語教學演示，依甄試簡章及現場公告辦理", oralScope: "排灣族語教支人員口試，依甄試簡章及現場公告辦理" },
+  ];
+  const slotTimes = ["09:00 - 09:10", "09:10 - 09:20", "09:20 - 09:30", "09:30 - 09:40", "09:40 - 09:50", "09:50 - 10:00"];
+  const teachingOrder = ["01", "02", "03", "04", "05", "06"];
+  const oralOrder = ["04", "05", "06", "01", "02", "03"];
+  const buildSubjects = (kind, scopeKey, roomCode, order) => order.map((no, index) => {
+    const row = rows.find((item) => item.no === no);
+    return {
+      id: `0708_${roomCode}_${row.no}`,
+      date: "7/8",
+      time: slotTimes[index],
+      subject: `${row.no}號 ${row.subject}－${row.name}`,
+      vacancy: row.vacancy,
+      scope: `${row[scopeKey]}（本場只看${kind}）`,
+      judges: kind === "試教" ? ["試教委員"] : ["口試委員"],
+      status: "未報到",
+      checklist,
+    };
+  });
+
   return {
-    round: "第1次招考",
+    round: "第1次第1招",
     date: "115年7月8日（星期三）",
-    method: "試教10分鐘＋口試10分鐘（免教案）",
-    per_candidate_minutes: 25,
+    method: "分場辦理：一間只看試教，一間只看口試",
+    per_candidate_minutes: 10,
+    note: "7/8 依主任指示分流：1、2、3號先考試教；4、5、6號先考口試，再互換場地。",
     rooms: [
       {
-        id: "0708_room_1",
-        room: "資優班教室一",
-        title: "考場一：資優班教室一",
-        time: "09:00 - 12:10",
-        mode: "邱俊智、羅靜之定點審查；委員不動",
-        subjects: [
-          { id: "job_1", date: "7/8", time: "09:00 - 12:10", subject: "導師(代理-實缺)", vacancy: "代理-實缺", scope: "數學科（試教+口試，免教案）", judges: ["邱俊智", "羅靜之"], status: "未招滿", checklist },
-        ],
+        id: "0708_teaching_room",
+        room: "試教場",
+        title: "試教場：只看試教",
+        time: "09:00 - 10:00",
+        mode: "本場僅辦理試教／教學演示評分；1、2、3號先考試教，4、5、6號接續試教。",
+        subjects: buildSubjects("試教", "teachScope", "teaching", teachingOrder),
       },
       {
-        id: "0708_room_2",
-        room: "資優班教室二",
-        title: "考場二：資優班教室二",
-        time: "09:00 - 12:20",
-        mode: "羅元廷、蘇一智定點審查；委員不動",
-        subjects: [
-          { id: "job_5", date: "7/8", time: "09:00 - 10:40", subject: "身障巡迴輔導班(特教代理-實缺)", vacancy: "特教代理-實缺", scope: "五年級數學（試教+口試，免教案）", judges: ["羅元廷", "蘇一智"], status: "未招滿", checklist },
-          { id: "job_7", date: "7/8", time: "10:40 - 12:20", subject: "體健科/國小科業務支援(代理)", vacancy: "代理", scope: "行政文書處理相關概念口試", judges: ["羅元廷", "蘇一智"], status: "未招滿", checklist },
-        ],
-      },
-      {
-        id: "0708_room_3",
-        room: "205 教室",
-        title: "考場三：205 教室",
-        time: "09:00 - 12:20",
-        mode: "黃志豪、鄭嘉琪、吳文瓊定點審查；委員不動",
-        subjects: [
-          { id: "job_2", date: "7/8", time: "09:00 - 10:40", subject: "社會科任(代理-實缺)", vacancy: "代理-實缺", scope: "五年級社會（試教10分+口試10分）", judges: ["黃志豪", "鄭嘉琪", "吳文瓊"], status: "未招滿", checklist },
-          { id: "job_3", date: "7/8", time: "10:40 - 12:20", subject: "美勞科任(代理-實缺)", vacancy: "代理-實缺", scope: "三年級木作教學（試教10分+口試10分）", judges: ["黃志豪", "鄭嘉琪", "吳文瓊"], status: "未招滿", checklist },
-          { id: "job_4", date: "7/8", time: "09:00 - 10:40", subject: "體育科任(代理-虛缺)", vacancy: "代理-虛缺", scope: "四或五年級體育（試教10分+口試10分）", judges: ["黃志豪", "鄭嘉琪", "吳文瓊"], status: "未招滿", checklist },
-          { id: "job_9", date: "7/8", time: "09:00 - 10:40", subject: "英語科任(代理-合理員額虛缺)", vacancy: "代理-合理員額虛缺", scope: "五年級英語（試教10分+口試10分）", judges: ["黃志豪", "鄭嘉琪", "吳文瓊"], status: "未招滿", checklist },
-          { id: "job_10", date: "7/8", time: "10:40 - 12:20", subject: "行政支援(代理-增置實缺)", vacancy: "代理-增置實缺", scope: "自然科學（試教10分+口試10分）", judges: ["黃志豪", "鄭嘉琪", "吳文瓊"], status: "未招滿", checklist },
-        ],
+        id: "0708_oral_room",
+        room: "口試場",
+        title: "口試場：只看口試",
+        time: "09:00 - 10:00",
+        mode: "本場僅辦理口試評分；4、5、6號先考口試，1、2、3號接續口試。",
+        subjects: buildSubjects("口試", "oralScope", "oral", oralOrder),
       },
     ],
   };
@@ -453,7 +461,7 @@ function sequenceSlotsTable(job, options = {}) {
   const slots = getPreciseTimeSlots(job);
   return `
     <div class="mt-2 mb-3 p-2 bg-light rounded border">
-      <small class="fw-bold d-block mb-1 text-secondary">⏱️ 考生順序精準時間（試教+口試）：</small>
+      <small class="fw-bold d-block mb-1 text-secondary">⏱️ 考生順序精準時間：</small>
       ${slots.map((slot, index) => `
         <div class="d-flex justify-content-between gap-3 text-muted sequence-slot-row" style="font-size: 0.85rem;">
           <span>第 ${index + 1} 號考生</span>
