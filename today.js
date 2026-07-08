@@ -3,7 +3,7 @@ const API_URL = "https://script.google.com/macros/s/AKfycby9v87cRPksXV5pvIhEXbZx
 const STORAGE_KEY = "qxes-subteacher-one-candidate-state-v1";
 const LOCAL_SCORES_KEY = "qxes-subteacher-one-candidate-local-scores-v1";
 
-const judges = ["第1評審委員", "第2評審委員", "第3評審委員", "第4評審委員", "第5評審委員"];
+const judges = ["邱俊智", "陳莉榛", "廖人鋐", "蘇一智", "鄭嘉琪", "吳文瓊", "高琳茵"];
 
 const candidates = [
   {
@@ -393,7 +393,8 @@ function bindScoreForms(root, candidate) {
 
       const scores = inputs.map((input) => Number(input.value));
       const job = currentJob(form.dataset.scoreKey);
-      submitScore(sendButton, {
+      const totalScore = calculateFormTotal(form);
+      var payload = {
         judgeName: selectedJudge,
         candidateNo: candidate.no,
         candidateName: candidate.name,
@@ -404,13 +405,17 @@ function bindScoreForms(root, candidate) {
         s3: scores[2],
         s4: scores[3],
         s5: scores[4],
-        total: Number(calculateFormTotal(form)),
-      });
+        total: Number(totalScore),
+      };
+
+      submitScore(sendButton, payload);
     });
   });
 }
 
 function printSignSheet() {
+  const signatureCells = judges.map(() => '<td class="sign"></td>').join("");
+  const signatureHeaders = judges.map((judge) => `<th>${escapeHtml(judge)}簽名</th>`).join("");
   const rows = candidates.map((candidate) => `
     <tr>
       <td class="center">${candidate.no}</td>
@@ -419,11 +424,7 @@ function printSignSheet() {
       <td>${escapeHtml(candidate.subject)}</td>
       <td>試教<br>${escapeHtml(candidate.schedule.teaching.time)}<br>${escapeHtml(candidate.schedule.teaching.room)}</td>
       <td>口試<br>${escapeHtml(candidate.schedule.oral.time)}<br>${escapeHtml(candidate.schedule.oral.room)}</td>
-      <td class="sign"></td>
-      <td class="sign"></td>
-      <td class="sign"></td>
-      <td class="sign"></td>
-      <td class="sign"></td>
+      ${signatureCells}
     </tr>
   `).join("");
 
@@ -503,11 +504,7 @@ function printSignSheet() {
               <th style="width: 8%;">科目</th>
               <th style="width: 11%;">試教排程</th>
               <th style="width: 11%;">口試排程</th>
-              <th>委員1簽名</th>
-              <th>委員2簽名</th>
-              <th>委員3簽名</th>
-              <th>委員4簽名</th>
-              <th>委員5簽名</th>
+              ${signatureHeaders}
             </tr>
           </thead>
           <tbody>${rows}</tbody>
