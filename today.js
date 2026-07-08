@@ -3,70 +3,147 @@ const API_URL = "https://script.google.com/macros/s/AKfycby9v87cRPksXV5pvIhEXbZx
 const STORAGE_KEY = "qxes-subteacher-one-candidate-state-v1";
 const LOCAL_SCORES_KEY = "qxes-subteacher-one-candidate-local-scores-v1";
 
-const judges = ["邱俊智", "陳莉榛", "廖人鋐", "蘇一智", "鄭嘉琪", "吳文瓊", "高琳茵"];
+const JUDGES = [
+  "邱俊智",
+  "陳莉榛",
+  "廖人鋐",
+  "蘇一智",
+  "鄭嘉琪",
+  "吳文瓊",
+  "高琳茵",
+  "王郁翔",
+];
+const CONFIG_PASSWORD = "csps";
+const judges = JUDGES;
 
-const candidates = [
+const CLASSROOM_ROUTING = {
+  ziyou_A: {
+    roomName: "資優班教室 A",
+    stageName: "第一試場（普通班導師與本土語）",
+    judges: ["邱俊智", "高琳茵"],
+    targetSubjects: ["一般代理教師-實缺(導師)", "閩南語教支人員"],
+  },
+  room_205: {
+    roomName: "205 教室",
+    stageName: "第二試場（語文與局端行政組）",
+    judges: ["鄭嘉琪", "廖人鋐"],
+    targetSubjects: ["一般代理教師-合理編制員額(英語)", "局端借調缺(體健科)", "局端借調缺(國小科)"],
+  },
+  room_206: {
+    roomName: "206 教室",
+    stageName: "第三試場（藝能與專長科任組）",
+    judges: ["吳文瓊", "陳莉榛"],
+    targetSubjects: ["一般代理教師-實缺(社會)", "一般代理教師-實缺(美勞)", "一般代課教師-美勞(鐘點)", "一般代課教師-體育(鐘點)"],
+  },
+  ziyou_B: {
+    roomName: "資優班教室 B",
+    stageName: "第四試場（特教巡輔組）",
+    judges: ["蘇一智", "王郁翔"],
+    targetSubjects: ["特教班代理教師-身心障礙不分類巡迴輔導班(控管缺)", "特教班代理教師-身心障礙不分類巡迴輔導班(一般代理)"],
+  },
+};
+
+// 調整後：全試場 09:00 齊發 - 測試考生名單與時間排程
+const TEST_CANDIDATES = [
+  // 1. 資優班教室 A（評審：邱俊智、高琳茵）
   {
-    no: "01",
-    name: "藍婷",
-    category: "一般代理",
-    subject: "導師",
-    schedule: {
-      teaching: { room: "試場 A", time: "09:00-09:10" },
-      oral: { room: "試場 B", time: "09:40-09:50" },
-    },
+    candidateNo: "A01",
+    candidateName: "000(測試導師)",
+    subject: "一般代理教師-實缺(導師)",
+    targetRoom: "ziyou_A",
+    startTime: "09:00",
+    endTime: "09:10",
   },
   {
-    no: "02",
-    name: "陳政輝",
-    category: "一般代理",
-    subject: "體育科任",
-    schedule: {
-      teaching: { room: "試場 A", time: "09:10-09:20" },
-      oral: { room: "試場 B", time: "09:50-10:00" },
-    },
+    candidateNo: "A02",
+    candidateName: "000(測試本土語)",
+    subject: "閩南語教支人員",
+    targetRoom: "ziyou_A",
+    startTime: "09:10",
+    endTime: "09:20",
+  },
+  // 2. 205 教室（評審：鄭嘉琪、廖人鋐）
+  {
+    candidateNo: "B01",
+    candidateName: "000(測試英代)",
+    subject: "一般代理教師-合理編制員額(英語)",
+    targetRoom: "room_205",
+    startTime: "09:00",
+    endTime: "09:10",
   },
   {
-    no: "03",
-    name: "倪月如",
-    category: "教支人員",
-    subject: "客語",
-    schedule: {
-      teaching: { room: "試場 A", time: "09:20-09:30" },
-      oral: { room: "試場 B", time: "10:00-10:10" },
-    },
+    candidateNo: "B02",
+    candidateName: "000(測試局端體健)",
+    subject: "局端借調缺(體健科)",
+    targetRoom: "room_205",
+    startTime: "09:10",
+    endTime: "09:20",
   },
   {
-    no: "04",
-    name: "古安富",
-    category: "教支人員",
-    subject: "排灣族語",
-    schedule: {
-      oral: { room: "試場 B", time: "09:00-09:10" },
-      teaching: { room: "試場 A", time: "09:40-09:50" },
-    },
+    candidateNo: "B03",
+    candidateName: "000(測試局端國小)",
+    subject: "局端借調缺(國小科)",
+    targetRoom: "room_205",
+    startTime: "09:20",
+    endTime: "09:30",
+  },
+  // 3. 206 教室（評審：吳文瓊、陳莉榛）
+  {
+    candidateNo: "C01",
+    candidateName: "000(測試社科)",
+    subject: "一般代理教師-實缺(社會)",
+    targetRoom: "room_206",
+    startTime: "09:00",
+    endTime: "09:10",
   },
   {
-    no: "05",
-    name: "吳慧姿",
-    category: "鐘點教師",
-    subject: "自然",
-    schedule: {
-      oral: { room: "試場 B", time: "09:10-09:20" },
-      teaching: { room: "試場 A", time: "09:50-10:00" },
-    },
+    candidateNo: "C02",
+    candidateName: "000(測試美勞)",
+    subject: "一般代理教師-實缺(美勞)",
+    targetRoom: "room_206",
+    startTime: "09:10",
+    endTime: "09:20",
   },
   {
-    no: "06",
-    name: "蘇于榕",
-    category: "鐘點教師",
-    subject: "閩南語",
-    schedule: {
-      oral: { room: "試場 B", time: "09:20-09:30" },
-      teaching: { room: "試場 A", time: "10:00-10:10" },
-    },
+    candidateNo: "C03",
+    candidateName: "000(測試體育鐘點)",
+    subject: "一般代課教師-體育(鐘點)",
+    targetRoom: "room_206",
+    startTime: "09:20",
+    endTime: "09:30",
+  },
+  // 4. 資優班教室 B（評審：蘇一智、王郁翔）
+  {
+    candidateNo: "D01",
+    candidateName: "000(測試特教巡輔)",
+    subject: "特教班代理教師-身心障礙不分類巡迴輔導班(控管缺)",
+    targetRoom: "ziyou_B",
+    startTime: "09:00",
+    endTime: "09:10",
   },
 ];
+
+const candidates = buildTestCandidates(TEST_CANDIDATES);
+
+function buildTestCandidates(items) {
+  return items.map((item) => {
+    const route = CLASSROOM_ROUTING[item.targetRoom];
+    const roomName = route?.roomName || "未設定教室";
+    const time = `${item.startTime}-${item.endTime}`;
+    return {
+      no: item.candidateNo,
+      name: item.candidateName,
+      category: item.subject,
+      subject: route?.stageName || "測試缺額",
+      routingSubject: item.subject,
+      targetRoom: item.targetRoom,
+      schedule: {
+        teaching: { room: roomName, time },
+        oral: { room: roomName, time },
+      },
+    };
+  });
+}
 
 const scoreTypes = {
   teaching: {
@@ -103,6 +180,38 @@ function currentCandidate() {
   return candidates[currentCandidateIndex];
 }
 
+function getSubjectsByJudge(judgeName) {
+  for (const roomId in CLASSROOM_ROUTING) {
+    if (CLASSROOM_ROUTING[roomId].judges.includes(judgeName)) {
+      return CLASSROOM_ROUTING[roomId].targetSubjects;
+    }
+  }
+  return [];
+}
+
+function getRoomByJudge(judgeName) {
+  for (const roomId in CLASSROOM_ROUTING) {
+    if (CLASSROOM_ROUTING[roomId].judges.includes(judgeName)) {
+      return CLASSROOM_ROUTING[roomId];
+    }
+  }
+  return null;
+}
+
+function getCandidateRoutingSubject(candidate) {
+  return candidate.routingSubject || candidate.fullSubject || "";
+}
+
+function canJudgeCandidate(judgeName, candidate) {
+  const routingSubject = getCandidateRoutingSubject(candidate);
+  if (!routingSubject) return true;
+  return getSubjectsByJudge(judgeName).includes(routingSubject);
+}
+
+function calculateFinalScore(scoreA, scoreB) {
+  return (parseFloat(scoreA) + parseFloat(scoreB)) / 2;
+}
+
 function activeScoreTypeKey() {
   if (currentView !== "judge") return "teaching";
 
@@ -124,7 +233,7 @@ function currentJob(scoreKey = activeScoreTypeKey()) {
     id: `candidate_${candidate.no}_${scoreKey}`,
     candidateNo: candidate.no,
     candidateName: candidate.name,
-    title: `${candidate.category} - ${candidate.subject}`,
+    title: candidate.routingSubject || `${candidate.category} - ${candidate.subject}`,
     scoreKey,
     scoreType: scoreTypes[scoreKey]?.label || "試教評分",
     room: selectedSchedule.room,
@@ -289,13 +398,28 @@ function renderJudgeStage() {
     return;
   }
 
+  if (!canJudgeCandidate(selectedJudge, candidate)) {
+    const room = getRoomByJudge(selectedJudge);
+    const subjects = getSubjectsByJudge(selectedJudge);
+    root.innerHTML = `
+      <div class="alert alert-secondary">
+        <h3 class="h5 fw-bold mb-2">此考生不屬於目前評審負責範圍</h3>
+        <p class="mb-2">${escapeHtml(selectedJudge)} 負責：${escapeHtml(room?.stageName || "未設定試場")}</p>
+        <div class="small">${subjects.map((subject) => `<span class="badge text-bg-light me-1 mb-1">${escapeHtml(subject)}</span>`).join("")}</div>
+      </div>
+    `;
+    return;
+  }
+
   const initialJob = currentJob("teaching");
+  const judgeRoom = getRoomByJudge(selectedJudge);
   root.innerHTML = `
     <article class="score-panel">
       <div class="d-flex flex-column flex-lg-row justify-content-between gap-2 mb-3">
         <div>
           <div class="text-secondary fw-bold">${escapeHtml(candidate.category)}｜${escapeHtml(candidate.subject)}</div>
           <h3 class="h2 fw-bold mb-1">${candidate.no} ${escapeHtml(candidate.name)}</h3>
+          ${judgeRoom ? `<div class="text-secondary">${escapeHtml(judgeRoom.stageName)}｜${escapeHtml(judgeRoom.roomName)}</div>` : ""}
           <div id="judgeScheduleLine" class="text-secondary">${escapeHtml(initialJob.scoreType)}｜${escapeHtml(initialJob.time)}｜${escapeHtml(initialJob.room)}</div>
         </div>
         <span id="judgeRoomBadge" class="badge text-bg-info align-self-lg-start fs-6">${escapeHtml(initialJob.room)}</span>
@@ -509,7 +633,7 @@ function printSignSheet() {
           </thead>
           <tbody>${rows}</tbody>
         </table>
-        <div class="note">試場 A：試教場地。試場 B：口試場地。請各評審委員完成線上評分後於本表簽名確認。</div>
+        <div class="note">資優班教室 1：試教場地。資優班教室 2：口試場地。請各評審委員完成線上評分後於本表簽名確認。</div>
       </body>
     </html>
   `);
@@ -659,7 +783,7 @@ function setupEvents() {
     }
 
     const password = prompt("請輸入評審驗證密碼");
-    if (password !== "csps") {
+    if (password !== CONFIG_PASSWORD) {
       alert("驗證失敗");
       event.target.value = selectedJudge;
       return;
