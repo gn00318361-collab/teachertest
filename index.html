@@ -3,213 +3,98 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>青溪國小代理代課教師甄試管理系統 v1.0</title>
-    <link rel="stylesheet" href="styles.css" />
+    <title>青溪國小代理代課教師甄試控制台｜三視角試務檢查就位版</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="today.css" />
   </head>
   <body>
-    <header class="topbar">
-      <div>
-        <p class="eyebrow">青溪國小試務管理系統 v1.0</p>
-        <h1>115學年度代理代課教師甄試</h1>
-      </div>
-      <div class="top-actions">
-        <a class="ghost-button" href="today.html">開啟甄試當天戰情看板</a>
-        <button id="resetSystem" class="ghost-button danger" type="button">還原預設資料</button>
+    <header class="hero-banner text-center shadow-sm">
+      <div class="container-fluid px-3 px-lg-5">
+        <h1 class="fw-bold h3 mb-2">🏫 桃園市桃園區青溪國民小學</h1>
+        <p class="mb-2 lead fw-semibold">115學年度代理代課教師甄試控制台｜三視角試務檢查就位版</p>
+        <p class="badge bg-warning text-dark fs-6 mb-3">7/8新版分流：01-03先試教、04-06先口試，第二輪交換場地</p>
+        <div class="d-flex flex-column flex-md-row justify-content-center gap-2 align-items-center">
+          <span id="liveClock" class="badge bg-dark px-3 py-2">載入時間中...</span>
+          <a class="btn btn-light btn-sm fw-bold" href="./index.html">三視角首頁</a>
+          <button id="resetThreeViews" class="btn btn-outline-light btn-sm fw-bold" type="button">重設三視角資料</button>
+        </div>
       </div>
     </header>
 
-    <main>
-      <section class="dashboard" aria-labelledby="dashboard-title">
-        <div class="dashboard-main">
-          <p class="eyebrow">試務控制 Dashboard</p>
-          <h2 id="dashboard-title">目前時間：<span id="currentTime">--</span></h2>
-          <p>考程階段：<strong id="currentPhase">準備中</strong></p>
-        </div>
-        <div class="kpi-grid">
-          <article class="kpi-card">
-            <span>全案缺額數</span>
-            <strong id="kpiQuota">0</strong>
-          </article>
-          <article class="kpi-card">
-            <span>未完成 Checklist</span>
-            <strong id="kpiPendingTasks">0</strong>
-          </article>
-          <article class="kpi-card">
-            <span>工作人員派任率</span>
-            <strong id="kpiStaffRate">0%</strong>
-          </article>
-          <article class="kpi-card">
-            <span>今日試務日誌</span>
-            <strong id="kpiTodayLogs">0</strong>
-          </article>
-        </div>
-      </section>
-
-      <section class="panel announcement-panel" aria-labelledby="announcement-title">
-        <div class="section-heading">
-          <div>
-            <p class="eyebrow">考生檢視視角</p>
-            <h2 id="announcement-title">前台動態公告與篩選</h2>
-          </div>
-          <button id="candidateMode" class="primary-button" type="button">切換至考生公告模式</button>
-        </div>
-        <div class="filter-bar" aria-label="缺額篩選">
-          <button class="filter-button is-active" data-filter="all" type="button">全部</button>
-          <button class="filter-button" data-filter="proxy" type="button">只看月薪代理</button>
-          <button class="filter-button" data-filter="hourly" type="button">只看鐘點代課</button>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>類別</th>
-                <th>職務名稱</th>
-                <th>缺額</th>
-                <th>缺額性質</th>
-                <th>試教科目範圍</th>
-                <th>招考狀態</th>
-                <th class="admin-only">後台操作</th>
-              </tr>
-            </thead>
-            <tbody id="jobRows"></tbody>
-          </table>
-        </div>
-      </section>
-
-      <section class="panel admin-panel" aria-labelledby="admin-title">
-        <div class="section-heading">
-          <div>
-            <p class="eyebrow">後台管理面板</p>
-            <h2 id="admin-title">試務作業模組</h2>
-          </div>
-        </div>
-
-        <nav class="tabs" aria-label="後台模組">
-          <button class="tab is-active" data-tab="people" type="button">人員與委員管理</button>
-          <button class="tab" data-tab="checklist" type="button">智慧 Checklist 控制台</button>
-          <button class="tab" data-tab="documents" type="button">試務文件中心</button>
-          <button class="tab" data-tab="logs" type="button">試務日誌與經驗反哺</button>
-        </nav>
-
-        <section id="tab-people" class="tab-page is-active">
-          <div class="two-column">
-            <section class="subpanel">
-              <h3>新增工作人員與委員</h3>
-              <form id="personForm" class="form-grid people-form">
-                <input name="id" type="hidden" />
-                <label>姓名
-                  <input name="name" type="text" required placeholder="例如：王小明" />
-                </label>
-                <label>身分
-                  <select name="kind">
-                    <option value="工作人員">工作人員</option>
-                    <option value="委員">委員</option>
-                  </select>
-                </label>
-                <label>支援日期
-                  <select name="date">
-                    <option>7/7</option>
-                    <option>7/8</option>
-                    <option>7/9</option>
-                    <option>7/10</option>
-                    <option>7/13</option>
-                  </select>
-                </label>
-                <label>負責職務
-                  <select name="role">
-                    <option>監試委員</option>
-                    <option>場地佈置</option>
-                    <option>聯絡報到</option>
-                    <option>計分複核</option>
-                  </select>
-                </label>
-                <button class="primary-button" type="submit">儲存人員</button>
-              </form>
-            </section>
-            <section class="subpanel">
-              <h3>核心職務派任狀態</h3>
-              <div id="staffCoverage" class="compact-list"></div>
-            </section>
-          </div>
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>姓名</th>
-                  <th>身分</th>
-                  <th>支援日期</th>
-                  <th>負責職務</th>
-                  <th>操作</th>
-                </tr>
-              </thead>
-              <tbody id="personRows"></tbody>
-            </table>
-          </div>
-        </section>
-
-        <section id="tab-checklist" class="tab-page">
-          <div class="progress-box">
-            <div>
-              <strong id="checklistPercent">0%</strong>
-              <span>Checklist 完成率</span>
+    <main class="container-fluid px-3 px-lg-5 py-4">
+      <section class="view-switch card shadow-sm mb-4">
+        <div class="card-body">
+          <div class="row g-2 text-center">
+            <div class="col-md-4">
+              <button class="btn btn-primary btn-lg fw-bold view-button active w-100" data-view="candidate" type="button">📱 考生資訊模式</button>
             </div>
-            <div class="progress-track"><div id="checklistBar" class="progress-bar"></div></div>
+            <div class="col-md-4">
+              <button class="btn btn-outline-success btn-lg fw-bold view-button w-100" data-view="judge" type="button">📋 評審委員模式</button>
+            </div>
+            <div class="col-md-4">
+              <button class="btn btn-outline-warning btn-lg fw-bold view-button w-100" data-view="admin" type="button">⚙️ 試務行政模式</button>
+            </div>
           </div>
-          <form id="taskForm" class="form-grid task-form">
-            <input name="id" type="hidden" />
-            <label>行政階段
-              <select name="phase">
-                <option>事前準備</option>
-                <option>甄試當天</option>
-                <option>甄試後</option>
-              </select>
-            </label>
-            <label>任務名稱
-              <input name="title" type="text" required placeholder="例如：準備口試試教評分表" />
-            </label>
-            <label>優先度
-              <select name="priority">
-                <option>High</option>
-                <option>Medium</option>
-                <option>Low</option>
-              </select>
-            </label>
-            <button class="primary-button" type="submit">新增任務</button>
-          </form>
-          <div id="checklistGroups" class="checklist-groups"></div>
-        </section>
+        </div>
+      </section>
 
-        <section id="tab-documents" class="tab-page">
-          <div class="document-actions">
-            <button id="exportStaffDoc" class="primary-button" type="button">一鍵匯出人員分工表.doc</button>
-            <button id="exportScoreDoc" class="primary-button" type="button">一鍵匯出委員評分簽章表.doc</button>
+      <section id="candidateView" class="view-panel active" aria-labelledby="candidate-title">
+        <div class="alert alert-primary border-0 shadow-sm time-banner" role="alert">
+          <div class="d-flex flex-column flex-xl-row justify-content-between gap-2">
+            <div>
+              <h2 id="candidate-title" class="h4 mb-1">考生資訊模式</h2>
+              <p class="mb-0">報到時間：<strong>上午 08:30 ~ 09:00</strong>（逾時 10 分鐘視同棄權）</p>
+            </div>
+            <div class="fs-5">報到地點：<strong>本校人事室</strong></div>
           </div>
-          <p class="muted">系統使用純前端 HTML-to-Word Blob 技術，將目前資料表格打包成 Word 可開啟的 .doc 文件。</p>
-          <div id="documentPreview" class="document-preview"></div>
-        </section>
+        </div>
+        <div class="mb-3">
+          <input id="candidateSearch" class="form-control form-control-lg shadow-sm" type="search" placeholder="🔍 輸入報考科目快速查詢（例：導師、自然、文書、木作）" />
+        </div>
+        <div id="candidateCards" class="job-card-grid"></div>
+      </section>
 
-        <section id="tab-logs" class="tab-page">
-          <form id="logForm" class="form-grid log-form">
-            <label>問題分類
-              <select name="category">
-                <option>設備</option>
-                <option>考程</option>
-                <option>考生爭議</option>
-              </select>
-            </label>
-            <label>狀況描述
-              <textarea name="description" required placeholder="例如：考生報到集中，等待時間過長"></textarea>
-            </label>
-            <label>明年改善建議
-              <textarea name="suggestion" required placeholder="例如：報到區增派一名人員並提前分流"></textarea>
-            </label>
-            <button class="primary-button" type="submit">新增日誌</button>
-          </form>
-          <div id="logRows" class="log-list"></div>
-        </section>
+      <section id="judgeView" class="view-panel" aria-labelledby="judge-title">
+        <div class="card shadow-sm mb-3">
+          <div class="card-body">
+            <div class="row g-3 align-items-end">
+              <div class="col-12 col-lg-5">
+                <label class="form-label fw-bold" for="judgeSelect">委員身分選擇</label>
+                <select id="judgeSelect" class="form-select form-select-lg"></select>
+              </div>
+              <div class="col">
+                <h2 id="judge-title" class="h4 mb-1">評審委員模式</h2>
+                <p class="text-secondary mb-0">選擇委員後，只顯示該委員被指派的科目卡片。</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="judgeCards" class="job-card-grid"></div>
+      </section>
+
+      <section id="adminView" class="view-panel" aria-labelledby="admin-title">
+        <div class="d-flex flex-column flex-lg-row justify-content-between gap-2 align-items-lg-end mb-3">
+          <div>
+            <p class="eyebrow mb-1">Staff & Admin View</p>
+            <h2 id="admin-title" class="h3 mb-0">試務行政模式</h2>
+          </div>
+          <p class="text-secondary mb-0">所有資料異動會立即存入 localStorage 並同步三個視角。</p>
+        </div>
+        <div id="adminCards" class="admin-stack"></div>
       </section>
     </main>
 
-    <script src="app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      [
+        "qxes-subteacher-three-views",
+        "qxes-subteacher-three-views-1150708-split-real",
+        "qxes-subteacher-three-views-1150708-director-split-v2",
+        "qxes-subteacher-three-views-1150708-director-split-v3",
+        "qxes-subteacher-rooms",
+        "qxes-subteacher-rooms-1150708-director-split-v3"
+      ].forEach((key) => localStorage.removeItem(key));
+    </script>
+    <script src="today.js?v=1150708-director-split-v4"></script>
   </body>
 </html>

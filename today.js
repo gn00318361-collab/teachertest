@@ -1,5 +1,5 @@
-const STORAGE_KEY = "qxes-subteacher-three-views-1150708-split-real";
-const ROOMS_KEY = "qxes-subteacher-rooms";
+const STORAGE_KEY = "qxes-subteacher-three-views-1150708-director-split-v4";
+const ROOMS_KEY = "qxes-subteacher-rooms-1150708-director-split-v4";
 
 const statusOptions = ["未招滿", "第1招錄取", "第2招錄取", "第3招錄取", "已額滿截止"];
 const judgeProgress = ["未開始", "評分中", "已繳交評分表"];
@@ -121,6 +121,7 @@ function finalJuly8Schedule() {
       time: slotTimes[index],
       subject: `${row.no}號 ${row.subject}－${row.name}`,
       vacancy: row.vacancy,
+      candidates: `${row.no}號 ${row.name}`,
       scope: `${row[scopeKey]}（本場只看${kind}）`,
       judges: kind === "試教" ? ["試教委員"] : ["口試委員"],
       status: "未報到",
@@ -245,7 +246,7 @@ function jobsFromRoomSchedules(schedules) {
           subject.subject,
           room.room,
           subject.judges || [],
-          "",
+          subject.candidates || "",
           exam.method || "試教＋口試",
           subject.scope || "",
           {
@@ -433,6 +434,9 @@ function buildSequenceSlots(job) {
 
 function getPreciseTimeSlots(job) {
   const date = job.dateKey || job.date || "";
+  if (job.id?.startsWith("0708_teaching_") || job.id?.startsWith("0708_oral_")) {
+    return buildSequenceSlots(job).map((slot) => slot.time.replace(/\s/g, ""));
+  }
   if (job.id === "job_1" || job.id === "0708_room_1_subject_1" || job.title.includes("導師")) {
     return preciseTimeSlotSets.full;
   }
@@ -505,6 +509,7 @@ function renderCandidateCards() {
     card.className = `job-card ${closed ? "closed" : ""}`;
     card.innerHTML = `
       <h3 class="h4 fw-black mb-3">🎯 報考科目：${escapeHtml(job.title)}</h3>
+      ${job.candidates ? `<p class="fs-5 fw-bold text-primary mb-2">👤 考生：${escapeHtml(job.candidates)}</p>` : ""}
       <p class="mb-2">🗓️ ${escapeHtml(job.dateLabel || "日期待公告")} ${job.round ? `｜${escapeHtml(job.round)}` : ""}</p>
       <p class="mb-2">⏰ 應試時段：${escapeHtml(job.time || "請靜待公告")}</p>
       <p class="fs-5 mb-3">📍 應試教室：${roomText(job)}</p>
