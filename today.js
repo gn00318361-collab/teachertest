@@ -1,4 +1,4 @@
-const API_URL = "https://script.google.com/macros/s/AKfycbzDyoKjAkA0t6pqZPd4gsY-wec38CNB3d55iuEd6yF7al3CkRkMCj6eqxsqmb-Ej8V6nA/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycby9v87cRPksXV5pvIhEXbZxvCE_L69JI06aQ26wMeX3vZCou2MiijkP9z0V8K9ONFga2g/exec";
 
 const STORAGE_KEY = "qxes-subteacher-one-candidate-state-v1";
 const LOCAL_SCORES_KEY = "qxes-subteacher-one-candidate-local-scores-v1";
