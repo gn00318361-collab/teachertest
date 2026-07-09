@@ -37,8 +37,8 @@ const RUN_TRACKS = {
   subject_track: {
     name: "學科專長特區流水線",
     stages: {
-      demo: { room: "206教室", judges: ["鄭嘉琪", "廖人鋐"], type: "試教" },
-      idv: { room: "205教室", judges: ["吳文瓊", "邱俊智"], type: "口試" },
+      demo: { room: "205教室", judges: ["鄭嘉琪", "廖人鋐"], type: "試教" },
+      idv: { room: "206教室", judges: ["吳文瓊", "邱俊智"], type: "口試" },
     },
     candidates: ["09", "10", "11", "12", "13", "14", "15", "17"],
   },
@@ -256,6 +256,18 @@ function changeCandidate(indexOffset) {
 function renderAll() {
   const candidate = candidates[currentCandidateIndex];
   const scores = [...cloudScoresCache, ...localScoresCache].filter(s => s.candidateNo === candidate.no);
+
+  // 動態更新評審下拉選單，將非本關評審設為 disabled
+  const select = document.querySelector("#judgeSelect");
+  if (select) {
+    select.innerHTML = '<option value="">請選擇...</option>' + JUDGES.map(j => {
+      const assignment = getJudgeAssignment(j, candidate);
+      if (!assignment) {
+        return `<option value="${j}" disabled style="color: #bbb; background-color: #f1f5f9;">${j} (非本關評審)</option>`;
+      }
+      return `<option value="${j}" ${j===selectedJudge?'selected':''}>${j}</option>`;
+    }).join("");
+  }
 
   // 更新導航列
   document.querySelector("#candidateCounter").textContent = `第 ${currentCandidateIndex + 1} 位 / 共 ${candidates.length} 位`;
@@ -539,7 +551,7 @@ function renderAdminStage() {
   };
 
   const giftedTableHtml = generateTableHtml("gifted_track", "🏛️ 資優班教室區 (試教: 資優教室1 / 口試: 資優教室2)", "bg-primary");
-  const subjectTableHtml = generateTableHtml("subject_track", "🚪 205、206教室區 (試教: 206教室 / 口試: 205教室)", "bg-dark");
+  const subjectTableHtml = generateTableHtml("subject_track", "🚪 205、206教室區 (試教: 205教室 / 口試: 206教室)", "bg-dark");
   
   document.querySelector("#adminStage").innerHTML = `
     <div class="row g-4 mb-4">
@@ -660,7 +672,7 @@ function renderPrintArea() {
   };
 
   const giftedHtml = generateSectionHtml("gifted_track", "🏛️ 資優班教室區 (試教: 資優教室1 / 口試: 資優教室2)");
-  const subjectHtml = generateSectionHtml("subject_track", "🚪 二年級教室區 (試教: 206教室 / 口試: 205教室)");
+  const subjectHtml = generateSectionHtml("subject_track", "🚪 二年級教室區 (試教: 205教室 / 口試: 206教室)");
 
   printEl.innerHTML = `
     ${giftedHtml}
@@ -675,7 +687,6 @@ document.addEventListener("DOMContentLoaded", () => {
   loadCustomNames();
   
   const select = document.querySelector("#judgeSelect");
-  select.innerHTML = '<option value="">請選擇...</option>' + JUDGES.map(j => `<option value="${j}" ${j===selectedJudge?'selected':''}>${j}</option>`).join("");
   
   select.addEventListener("change", (e) => {
     if (!e.target.value) {
