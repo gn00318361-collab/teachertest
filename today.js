@@ -1,6 +1,6 @@
-const API_URL = "https://script.google.com/macros/s/AKfycbx_tMdBueAo-6mLgoAdVA9c35ViQzPFXdtMnVF8X6otPGDfJFQiAH7v5pxYF_SPfOQ/exec";
-const STORAGE_KEY = "qxes-subteacher-one-candidate-state-v1";
-const LOCAL_SCORES_KEY = "qxes-subteacher-one-candidate-local-scores-v1";
+const API_URL = "https://script.google.com/macros/s/AKfycbzur3hBvwvh9RFvyqwudh8510TU3I_KQVutL9jkzuc99e1Z_dsADn5lf9Co7uQNRU1J/exec";
+const STORAGE_KEY = "qxes-subteacher-score-console-1150708-v1";
+const LOCAL_SCORES_KEY = "qxes-subteacher-score-console-1150708-local-scores-v1";
 const CONFIG_PASSWORD = "csps";
 
 const JUDGES = ["邱俊智", "陳莉榛", "廖人鋐", "蘇一智", "鄭嘉琪", "吳文瓊", "高琳茵", "王郁翔"];
@@ -371,30 +371,47 @@ function renderJudgeStage(candidate, scores) {
       input.select();
     });
     
-    // 按下 Enter 自動跳下一格
+    // 按鍵導航 (Enter / Down Arrow 跳下一格, Up Arrow 跳上一格)
     input.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
+      if (e.key === "Enter" || e.key === "ArrowDown") {
         e.preventDefault();
         if (index < inputs.length - 1) {
           inputs[index + 1].focus();
-        } else {
-          form.querySelector('button[type="submit"]').focus();
+        } else if (e.key === "Enter") {
+          const submitBtn = form.querySelector('button[type="submit"]');
+          if (submitBtn) submitBtn.focus();
+        }
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        if (index > 0) {
+          inputs[index - 1].focus();
         }
       }
     });
-
-    // 輸入值即時驗證與總分計算
+    
+    // 輸入值即時驗證、總分計算 與 輸入滿2位數自動跳下一格
     input.addEventListener("input", () => {
-      const val = Number(input.value);
+      const valStr = input.value;
+      const val = Number(valStr);
       const max = Number(input.dataset.max);
       const errEl = form.querySelector(`#err-${index}`);
       
-      if (input.value.trim() !== "" && (val < 0 || val > max)) {
+      if (valStr.trim() !== "" && (val < 0 || val > max)) {
         input.classList.add("is-invalid");
         if (errEl) errEl.style.display = "block";
       } else {
         input.classList.remove("is-invalid");
         if (errEl) errEl.style.display = "none";
+        
+        // 防呆自動跳格：若輸入滿 2 位數且無小數點，自動聚焦下一格
+        if (valStr.length >= 2 && !valStr.includes(".") && valStr.trim() !== "") {
+          if (index < inputs.length - 1) {
+            inputs[index + 1].focus();
+          } else {
+            const submitBtn = form.querySelector('button[type="submit"]');
+            if (submitBtn) submitBtn.focus();
+          }
+        }
       }
       
       let total = 0;
@@ -407,11 +424,12 @@ function renderJudgeStage(candidate, scores) {
         }
         total += v;
       });
-      document.querySelector("#totalDisplay").textContent = total.toFixed(1);
+      const totalDisp = document.querySelector("#totalDisplay");
+      if (totalDisp) totalDisp.textContent = total.toFixed(1);
       
       // 若有不合規的分數，停用送出按鈕
       const submitBtn = form.querySelector('button[type="submit"]');
-      submitBtn.disabled = hasError;
+      if (submitBtn) submitBtn.disabled = hasError;
     });
   });
 
@@ -450,44 +468,78 @@ function renderAdminStage() {
   // 每位考生需要 4 筆評分（試教 2 筆、口試 2 筆）
   const totalCompleted = candidates.filter(c => allScores.filter(s => s.candidateNo === c.no).length >= 4).length;
   
-  const tableRows = candidates.map(c => {
-    const track = RUN_TRACKS[c.trackKey];
-    const demoJudges = track.stages.demo.judges;
-    const idvJudges = track.stages.idv.judges;
-    const scoresForC = allScores.filter(s => s.candidateNo === c.no);
-    
-    const demoStatusHtml = demoJudges.map(j => {
-      const hasScore = scoresForC.some(s => s.judgeName === j && s.scoreType === "試教評分");
-      return `<span class="judge-tag ${hasScore ? 'done' : 'waiting'}">${j}${hasScore ? ' ✅' : ''}</span>`;
-    }).join(" ");
-    
-    const idvStatusHtml = idvJudges.map(j => {
-      const hasScore = scoresForC.some(s => s.judgeName === j && s.scoreType === "口試評分");
-      return `<span class="judge-tag ${hasScore ? 'done' : 'waiting'}">${j}${hasScore ? ' ✅' : ''}</span>`;
-    }).join(" ");
-    
-    const count = scoresForC.length;
-    
+  const generateTableHtml = (trackKey, title, badgeColorClass) => {
+    const trackCandidates = candidates.filter(c => c.trackKey === trackKey);
+    const rowsHtml = trackCandidates.map(c => {
+      const track = RUN_TRACKS[c.trackKey];
+      const demoJudges = track.stages.demo.judges;
+      const idvJudges = track.stages.idv.judges;
+      const scoresForC = allScores.filter(s => s.candidateNo === c.no);
+      
+      const demoStatusHtml = demoJudges.map(j => {
+        const hasScore = scoresForC.some(s => s.judgeName === j && s.scoreType === "試教評分");
+        return `<span class="judge-tag ${hasScore ? 'done' : 'waiting'}" style="font-size: 1.05rem; padding: 6px 12px; margin-right: 4px;">${j}${hasScore ? ' ✅' : ''}</span>`;
+      }).join(" ");
+      
+      const idvStatusHtml = idvJudges.map(j => {
+        const hasScore = scoresForC.some(s => s.judgeName === j && s.scoreType === "口試評分");
+        return `<span class="judge-tag ${hasScore ? 'done' : 'waiting'}" style="font-size: 1.05rem; padding: 6px 12px; margin-right: 4px;">${j}${hasScore ? ' ✅' : ''}</span>`;
+      }).join(" ");
+      
+      const count = scoresForC.length;
+      
+      return `
+        <tr style="font-size: 1.15rem;">
+          <td class="fw-bold text-start" style="padding-left: 1.5rem; font-size: 1.25rem; height: 65px; color: var(--brand-deep);">${c.no} ${c.name}</td>
+          <td><span class="badge bg-light text-dark border" style="font-size: 0.95rem; padding: 6px 10px;">${c.category}</span></td>
+          <td class="text-start" style="padding: 10px 15px;">
+            <div class="small text-muted mb-1" style="font-size: 0.95rem; font-weight: 500;">⏱️ ${c.schedule.teaching.time} (${c.schedule.teaching.room})</div>
+            <div class="d-flex flex-wrap gap-1 mt-1">${demoStatusHtml}</div>
+          </td>
+          <td class="text-start" style="padding: 10px 15px;">
+            <div class="small text-muted mb-1" style="font-size: 0.95rem; font-weight: 500;">⏱️ ${c.schedule.oral.time} (${c.schedule.oral.room})</div>
+            <div class="d-flex flex-wrap gap-1 mt-1">${idvStatusHtml}</div>
+          </td>
+          <td>
+            <span class="status-badge ${count >= 4 ? 'completed' : 'pending'}" style="font-size: 1.05rem; padding: 6px 14px; font-weight: 700;">
+              ${count} / 4
+            </span>
+          </td>
+        </tr>
+      `;
+    }).join("");
+
     return `
-      <tr>
-        <td class="fw-bold text-start" style="padding-left: 1.5rem;">${c.no} ${c.name}</td>
-        <td><span class="badge bg-light text-dark border">${c.category}</span></td>
-        <td class="text-start">
-          <div class="small text-muted mb-1">${c.schedule.teaching.time} (${c.schedule.teaching.room})</div>
-          <div>${demoStatusHtml}</div>
-        </td>
-        <td class="text-start">
-          <div class="small text-muted mb-1">${c.schedule.oral.time} (${c.schedule.oral.room})</div>
-          <div>${idvStatusHtml}</div>
-        </td>
-        <td>
-          <span class="status-badge ${count >= 4 ? 'completed' : 'pending'}">
-            ${count} / 4 筆已送出
-          </span>
-        </td>
-      </tr>
+      <div class="surface p-0 overflow-hidden shadow-sm mb-4 border border-2">
+        <div class="p-3 bg-light border-bottom d-flex justify-content-between align-items-center">
+          <h5 class="fw-bold mb-0 text-primary d-flex align-items-center" style="font-size: 1.35rem;">
+            <span class="badge ${badgeColorClass} me-2" style="font-size: 1.05rem; padding: 8px 12px;">試場分區</span>
+            ${title}
+          </h5>
+          <span class="badge bg-secondary-subtle text-secondary fw-bold" style="font-size: 0.95rem; padding: 6px 10px;">共 ${trackCandidates.length} 位考生</span>
+        </div>
+        <div class="table-responsive">
+          <table class="admin-table mb-0">
+            <thead>
+              <tr style="font-size: 1.05rem; background-color: #f8fafc;">
+                <th style="padding-left: 1.5rem; text-align: left; width: 22%;">考生編號 & 姓名</th>
+                <th style="width: 20%;">甄試類別</th>
+                <th style="text-align: left; width: 26%;">試教關卡狀態 (評審)</th>
+                <th style="text-align: left; width: 26%;">口試關卡狀態 (評審)</th>
+                <th style="width: 10%;">已收</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rowsHtml}
+            </tbody>
+          </table>
+        </div>
+      </div>
     `;
-  }).join("");
+  };
+
+  const giftedTableHtml = generateTableHtml("gifted_track", "🏛️ 資優班教室區 (試教: 資優教室1 / 口試: 資優教室2)", "bg-primary");
+  const subjectTableHtml = generateTableHtml("subject_track", "🚪 205、206教室區 (試教: 206教室 / 口試: 205教室)", "bg-dark");
   
   document.querySelector("#adminStage").innerHTML = `
     <div class="row g-4 mb-4">
@@ -513,29 +565,8 @@ function renderAdminStage() {
       </div>
     </div>
     
-    <div class="surface p-0 overflow-hidden shadow-sm mb-4">
-      <div class="p-3 bg-light border-bottom d-flex justify-content-between align-items-center">
-        <h5 class="fw-bold mb-0 text-primary">📊 現場評分監控進度看板</h5>
-        <span class="badge bg-primary-subtle text-primary fw-bold">自動更新：20秒/次</span>
-      </div>
-      <div class="table-responsive">
-        <table class="admin-table mb-0">
-          <thead>
-            <tr>
-              <th style="padding-left: 1.5rem; text-align: left;">考生編號 & 姓名</th>
-              <th>甄試類別</th>
-              <th style="text-align: left;">試教關卡狀態 (評審)</th>
-              <th style="text-align: left;">口試關卡狀態 (評審)</th>
-              <th>已收筆數</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${tableRows}
-          </tbody>
-        </table>
-      </div>
-    </div>
-
+    ${giftedTableHtml}
+    ${subjectTableHtml}
     <div class="surface p-4 shadow-sm mb-4">
       <h5 class="fw-bold mb-3 text-primary">✏️ 現場考生姓名登記 (颱風天臨時調整/缺考登錄專用)</h5>
       <p class="text-muted small">若是因為颱風天或缺考導致名單有變動，您可直接在此修改考生姓名（例如輸入實際到考姓名，或將缺考者改為「(未到考)」），修改後點選「儲存並更新名單」即可更新所有畫面，毋須修改原始碼。</p>
@@ -595,7 +626,7 @@ function renderPrintArea() {
   }).join("");
   
   printEl.innerHTML = `
-    <div class="print-title">桃園市桃園區青溪國民小學 115 學年度代理代課教師甄試數位評分控制台</div>
+    <div class="print-title">桃園市桃園區青溪國民小學 115 學年度第 3 次招考第 1 次代理代課教師甄試數位評分控制台</div>
     <div class="print-subtitle">甄試流水線排程暨委員簽名確認表 (列印時間：${new Date().toLocaleString()})</div>
     <table class="print-table">
       <thead>
