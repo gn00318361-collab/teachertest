@@ -5,6 +5,26 @@ const CONFIG_PASSWORD = "csps";
 
 const JUDGES = ["邱俊智", "陳莉榛", "廖人鋐", "蘇一智", "鄭嘉琪", "吳文瓊", "高琳茵", "王郁翔"];
 
+const CANDIDATE_REGISTRY = {
+  "01": { name: "導師 缺額A", category: "一般代理", subject: "導師" },
+  "02": { name: "導師 缺額B", category: "一般代理", subject: "導師" },
+  "03": { name: "導師 缺額C", category: "一般代理", subject: "導師" },
+  "04": { name: "導師 缺額D", category: "一般代理", subject: "導師" },
+  "05": { name: "社會科任 缺額A", category: "一般代理", subject: "社會科任" },
+  "06": { name: "美勞科任 缺額A", category: "一般代理", subject: "美勞科任" },
+  "07": { name: "特教巡迴 缺額A", category: "特教代理", subject: "身障巡迴" },
+  "08": { name: "特教巡迴 缺額B", category: "特教代理", subject: "身障巡迴" },
+  "09": { name: "體健業務 缺額A", category: "一般代理", subject: "體育保健科" },
+  "10": { name: "教育科業務 缺額A", category: "一般代理", subject: "國小教育科" },
+  "11": { name: "英語科任 缺額A", category: "一般代理", subject: "英語科任" },
+  "12": { name: "英語科任 缺額B", category: "一般代理", subject: "英語科任" },
+  "13": { name: "增置餘額 缺額A", category: "一般代理", subject: "增置餘額" },
+  "14": { name: "代課美勞 缺額A", category: "一般代課", subject: "美勞鐘點" },
+  "15": { name: "代課美勞 缺額B", category: "一般代課", subject: "美勞鐘點" },
+  "16": { name: "代課體育 缺額A", category: "一般代課", subject: "體育鐘點" },
+  "17": { name: "教支閩南語 缺額A", category: "教支人員", subject: "閩南語" }
+};
+
 const RUN_TRACKS = {
   gifted_track: {
     name: "資優班特區流水線",
@@ -12,7 +32,7 @@ const RUN_TRACKS = {
       demo: { room: "資優教室1", judges: ["邱俊智", "高琳茵"], type: "試教" },
       idv: { room: "資優教室2", judges: ["蘇一智", "王郁翔"], type: "口試" },
     },
-    candidates: ["001", "002", "003", "004", "005", "006", "007", "008"],
+    candidates: ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "13"],
   },
   subject_track: {
     name: "學科專長特區流水線",
@@ -20,7 +40,7 @@ const RUN_TRACKS = {
       demo: { room: "206教室", judges: ["吳文瓊", "陳莉榛"], type: "試教" },
       idv: { room: "205教室", judges: ["鄭嘉琪", "廖人鋐"], type: "口試" },
     },
-    candidates: ["009", "010", "011", "012", "013", "014", "015", "016"],
+    candidates: ["11", "12", "14", "15", "16", "17"],
   },
 };
 
@@ -52,8 +72,12 @@ function generatePipelineSchedule() {
       const demoEndTime = addMinutes(demoStartTime, STAGE_DURATION);
       const idvStartTime = addMinutes(demoStartTime, TIME_STEP);
       const idvEndTime = addMinutes(idvStartTime, STAGE_DURATION);
+      
+      const reg = CANDIDATE_REGISTRY[candidateNo];
+      const candidateName = reg ? reg.name : `考生${candidateNo}`;
+      
       scheduleResult[trackKey].push({
-        candidateNo, candidateName: `考生${candidateNo}`,
+        candidateNo, candidateName,
         demo: { room: track.stages.demo.room, timeRange: `${demoStartTime}-${demoEndTime}` },
         idv: { room: track.stages.idv.room, timeRange: `${idvStartTime}-${idvEndTime}` },
       });
@@ -65,12 +89,30 @@ function generatePipelineSchedule() {
 const globalSchedule = generatePipelineSchedule();
 const candidates = Object.entries(globalSchedule).flatMap(([trackKey, rows]) => {
   const track = RUN_TRACKS[trackKey];
-  return rows.map((row) => ({
-    no: row.candidateNo, name: row.candidateName, category: track.name,
-    subject: `${track.stages.demo.room} → ${track.stages.idv.room}`,
-    trackKey, schedule: { teaching: { room: row.demo.room, time: row.demo.timeRange }, oral: { room: row.idv.room, time: row.idv.timeRange } }
-  }));
+  return rows.map((row) => {
+    const reg = CANDIDATE_REGISTRY[row.candidateNo];
+    const category = reg ? `${reg.category} - ${reg.subject}` : track.name;
+    return {
+      no: row.candidateNo, name: row.candidateName, category: category,
+      subject: `${track.stages.demo.room} → ${track.stages.idv.room}`,
+      trackKey, schedule: { teaching: { room: row.demo.room, time: row.demo.timeRange }, oral: { room: row.idv.room, time: row.idv.timeRange } }
+    };
+  });
 });
+
+let customCandidateNames = {};
+function loadCustomNames() {
+  try {
+    customCandidateNames = JSON.parse(localStorage.getItem("qxes-subteacher-custom-names-v1") || "{}");
+  } catch (e) {
+    customCandidateNames = {};
+  }
+  candidates.forEach(c => {
+    if (customCandidateNames[c.no]) {
+      c.name = customCandidateNames[c.no];
+    }
+  });
+}
 
 let currentView = "candidate";
 let currentCandidateIndex = 0;
@@ -112,7 +154,19 @@ async function submitScore(button, payload) {
     localStorage.setItem(LOCAL_SCORES_KEY, JSON.stringify(localScoresCache));
     button.className = "btn btn-success btn-lg w-100 py-3 fw-bold";
     button.textContent = "✅ 分數已送出";
-    setTimeout(() => { renderAll(); syncScoresFromCloud(); }, 1000);
+    
+    setTimeout(() => {
+      // 自動跳下一位負責的考生
+      const nextIdx = getNextAssignedCandidateIndex(selectedJudge, currentCandidateIndex);
+      if (nextIdx !== -1) {
+        currentCandidateIndex = nextIdx;
+        saveState();
+      } else {
+        alert("🎉 您已完成所有指派考生的評分！");
+      }
+      renderAll();
+      syncScoresFromCloud();
+    }, 1000);
   } catch (error) {
     alert("送出失敗，請檢查網路連線");
     button.disabled = false;
@@ -133,6 +187,26 @@ function getJudgeAssignment(judge, candidate) {
   return null;
 }
 
+// 輔助函式：取得下一個此評審負責的考生索引
+function getNextAssignedCandidateIndex(judge, startIndex) {
+  for (let i = startIndex + 1; i < candidates.length; i++) {
+    if (getJudgeAssignment(judge, candidates[i]) !== null) {
+      return i;
+    }
+  }
+  return -1;
+}
+
+// 輔助函式：取得上一個此評審負責的考生索引
+function getPrevAssignedCandidateIndex(judge, startIndex) {
+  for (let i = startIndex - 1; i >= 0; i--) {
+    if (getJudgeAssignment(judge, candidates[i]) !== null) {
+      return i;
+    }
+  }
+  return -1;
+}
+
 // 輔助函式：檢查目前表單是否有輸入值 (未存檔)
 function isFormDirty() {
   const form = document.querySelector("#scoreForm");
@@ -147,15 +221,31 @@ function isFormDirty() {
   return isDirty;
 }
 
-// 輔助函式：切換考生 (帶防呆)
+// 輔助函式：切換考生 (帶防呆與評審指派跳轉)
 function changeCandidate(indexOffset) {
   if (currentView === "judge" && isFormDirty()) {
     if (!confirm("⚠️ 您的評分表已填寫部分分數但尚未送出，切換考生會清除現有輸入。確定要切換考生嗎？")) {
       return;
     }
   }
-  const newIndex = currentCandidateIndex + indexOffset;
-  if (newIndex >= 0 && newIndex < candidates.length) {
+  
+  let newIndex = currentCandidateIndex;
+  if (currentView === "judge" && selectedJudge) {
+    if (indexOffset > 0) {
+      const nextIdx = getNextAssignedCandidateIndex(selectedJudge, currentCandidateIndex);
+      if (nextIdx !== -1) newIndex = nextIdx;
+    } else {
+      const prevIdx = getPrevAssignedCandidateIndex(selectedJudge, currentCandidateIndex);
+      if (prevIdx !== -1) newIndex = prevIdx;
+    }
+  } else {
+    const targetIndex = currentCandidateIndex + indexOffset;
+    if (targetIndex >= 0 && targetIndex < candidates.length) {
+      newIndex = targetIndex;
+    }
+  }
+  
+  if (newIndex !== currentCandidateIndex) {
     currentCandidateIndex = newIndex;
     saveState();
     renderAll();
@@ -170,8 +260,16 @@ function renderAll() {
   // 更新導航列
   document.querySelector("#candidateCounter").textContent = `第 ${currentCandidateIndex + 1} 位 / 共 ${candidates.length} 位`;
   document.querySelector("#candidateNameBar").textContent = `${candidate.no} ${candidate.name}`;
-  document.querySelector("#prevCandidate").disabled = currentCandidateIndex === 0;
-  document.querySelector("#nextCandidate").disabled = currentCandidateIndex === candidates.length - 1;
+  
+  if (currentView === "judge" && selectedJudge) {
+    const nextIdx = getNextAssignedCandidateIndex(selectedJudge, currentCandidateIndex);
+    const prevIdx = getPrevAssignedCandidateIndex(selectedJudge, currentCandidateIndex);
+    document.querySelector("#prevCandidate").disabled = prevIdx === -1;
+    document.querySelector("#nextCandidate").disabled = nextIdx === -1;
+  } else {
+    document.querySelector("#prevCandidate").disabled = currentCandidateIndex === 0;
+    document.querySelector("#nextCandidate").disabled = currentCandidateIndex === candidates.length - 1;
+  }
 
   // 1. 考生面板
   document.querySelector("#candidateView").innerHTML = `
@@ -373,7 +471,7 @@ function renderAdminStage() {
     return `
       <tr>
         <td class="fw-bold text-start" style="padding-left: 1.5rem;">${c.no} ${c.name}</td>
-        <td><span class="badge bg-light text-dark border">${track.name.replace("流水線", "")}</span></td>
+        <td><span class="badge bg-light text-dark border">${c.category}</span></td>
         <td class="text-start">
           <div class="small text-muted mb-1">${c.schedule.teaching.time} (${c.schedule.teaching.room})</div>
           <div>${demoStatusHtml}</div>
@@ -436,6 +534,26 @@ function renderAdminStage() {
           </tbody>
         </table>
       </div>
+    </div>
+
+    <div class="surface p-4 shadow-sm mb-4">
+      <h5 class="fw-bold mb-3 text-primary">✏️ 現場考生姓名登記 (颱風天臨時調整/缺考登錄專用)</h5>
+      <p class="text-muted small">若是因為颱風天或缺考導致名單有變動，您可直接在此修改考生姓名（例如輸入實際到考姓名，或將缺考者改為「(未到考)」），修改後點選「儲存並更新名單」即可更新所有畫面，毋須修改原始碼。</p>
+      <form id="candidateEditForm">
+        <div class="row g-2">
+          ${candidates.map(c => `
+            <div class="col-12 col-md-6 col-lg-4 mb-2">
+              <div class="input-group input-group-sm">
+                <span class="input-group-text fw-bold text-truncate" style="width: 145px; justify-content: flex-start;">${c.no} ${c.category.split(" - ")[1] || c.category}</span>
+                <input type="text" class="form-control candidate-name-input" data-no="${c.no}" value="${c.name}">
+              </div>
+            </div>
+          `).join("")}
+        </div>
+        <div class="text-end">
+          <button type="submit" class="btn btn-primary btn-sm mt-3 px-4 py-2 fw-bold" style="border-radius: 8px;">💾 儲存並更新名單</button>
+        </div>
+      </form>
     </div>
   `;
 }
@@ -509,6 +627,7 @@ function renderPrintArea() {
 // [初始化與事件監聽]
 document.addEventListener("DOMContentLoaded", () => {
   loadState();
+  loadCustomNames();
   
   const select = document.querySelector("#judgeSelect");
   select.innerHTML = '<option value="">請選擇...</option>' + JUDGES.map(j => `<option value="${j}" ${j===selectedJudge?'selected':''}>${j}</option>`).join("");
@@ -522,6 +641,16 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     if (prompt("請輸入驗證密碼") === CONFIG_PASSWORD) {
       selectedJudge = e.target.value;
+      
+      // 自動跳轉至該評審負責的第一位考生 (若目前選中的考生不屬於他)
+      const assignment = getJudgeAssignment(selectedJudge, candidates[currentCandidateIndex]);
+      if (!assignment) {
+        const firstAssignedIdx = candidates.findIndex(c => getJudgeAssignment(selectedJudge, c) !== null);
+        if (firstAssignedIdx !== -1) {
+          currentCandidateIndex = firstAssignedIdx;
+        }
+      }
+      
       saveState();
       renderAll();
     } else {
@@ -594,6 +723,40 @@ document.addEventListener("DOMContentLoaded", () => {
       p.classList.add("active");
     } else {
       p.classList.remove("active");
+    }
+  });
+
+  // 監聽並儲存現場登記的考生名單
+  document.addEventListener("submit", (e) => {
+    if (e.target && e.target.id === "candidateEditForm") {
+      e.preventDefault();
+      const form = e.target;
+      const inputs = form.querySelectorAll(".candidate-name-input");
+      const customNames = {};
+      inputs.forEach(input => {
+        const no = input.dataset.no;
+        const val = input.value.trim();
+        if (val) {
+          customNames[no] = val;
+        }
+      });
+      localStorage.setItem("qxes-subteacher-custom-names-v1", JSON.stringify(customNames));
+      loadCustomNames();
+      
+      // 確保目前的 candidateIndex 還在該評審權限範圍內
+      if (selectedJudge) {
+        const currentAssignment = getJudgeAssignment(selectedJudge, candidates[currentCandidateIndex]);
+        if (!currentAssignment) {
+          const firstAssignedIdx = candidates.findIndex(c => getJudgeAssignment(selectedJudge, c) !== null);
+          if (firstAssignedIdx !== -1) {
+            currentCandidateIndex = firstAssignedIdx;
+            saveState();
+          }
+        }
+      }
+      
+      renderAll();
+      alert("💾 考生名單已儲存並更新！");
     }
   });
 
