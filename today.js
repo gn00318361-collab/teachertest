@@ -6,23 +6,23 @@ const CONFIG_PASSWORD = "csps";
 const JUDGES = ["邱俊智", "陳莉榛", "廖人鋐", "蘇一智", "鄭嘉琪", "吳文瓊", "高琳茵", "王郁翔"];
 
 const CANDIDATE_REGISTRY = {
-  "01": { name: "導師 缺額A", category: "一般代理", subject: "導師" },
-  "02": { name: "導師 缺額B", category: "一般代理", subject: "導師" },
-  "03": { name: "導師 缺額C", category: "一般代理", subject: "導師" },
-  "04": { name: "導師 缺額D", category: "一般代理", subject: "導師" },
-  "05": { name: "社會科任 缺額A", category: "一般代理", subject: "社會科任" },
-  "06": { name: "美勞科任 缺額A", category: "一般代理", subject: "美勞科任" },
-  "07": { name: "特教巡迴 缺額A", category: "特教代理", subject: "身障巡迴" },
-  "08": { name: "特教巡迴 缺額B", category: "特教代理", subject: "身障巡迴" },
-  "09": { name: "體健業務 缺額A", category: "一般代理", subject: "體育保健科" },
-  "10": { name: "教育科業務 缺額A", category: "一般代理", subject: "國小教育科" },
-  "11": { name: "英語科任 缺額A", category: "一般代理", subject: "英語科任" },
-  "12": { name: "英語科任 缺額B", category: "一般代理", subject: "英語科任" },
-  "13": { name: "增置餘額 缺額A", category: "一般代理", subject: "增置餘額" },
-  "14": { name: "代課美勞 缺額A", category: "一般代課", subject: "美勞鐘點" },
-  "15": { name: "代課美勞 缺額B", category: "一般代課", subject: "美勞鐘點" },
-  "16": { name: "代課體育 缺額A", category: "一般代課", subject: "體育鐘點" },
-  "17": { name: "教支閩南語 缺額A", category: "教支人員", subject: "閩南語" }
+  "01": { name: "梅宸葳", category: "一般代理", subject: "導師" },
+  "02": { name: "陳玫婷", category: "一般代理", subject: "導師" },
+  "03": { name: "鄒芬芳", category: "一般代理", subject: "導師" },
+  "04": { name: "陳俐蓁", category: "一般代理", subject: "導師" },
+  "05": { name: "廖玉琪", category: "一般代理", subject: "導師" },
+  "06": { name: "李珮如", category: "一般代理", subject: "導師" },
+  "07": { name: "翁珮倫", category: "一般代理", subject: "社會科任" },
+  "08": { name: "曾郁嘉", category: "一般代理", subject: "美勞科任" },
+  "09": { name: "徐薇翕", category: "特教代理", subject: "身障巡迴" },
+  "10": { name: "蕭文綾", category: "一般代理", subject: "體育保健科" },
+  "11": { name: "邱可葳", category: "一般代理", subject: "國小教育科" },
+  "12": { name: "蔡穎薇", category: "一般代理", subject: "英語科任" },
+  "13": { name: "廖彥婷", category: "一般代理", subject: "英語科任" },
+  "14": { name: "梁馨", category: "一般代理", subject: "增置餘額" },
+  "15": { name: "蕭惠娟", category: "一般代課", subject: "美勞鐘點" },
+  "16": { name: "郭志麒", category: "一般代課", subject: "體育鐘點" },
+  "17": { name: "朱克弘", category: "一般代課", subject: "體育鐘點" }
 };
 
 const RUN_TRACKS = {
@@ -32,7 +32,7 @@ const RUN_TRACKS = {
       demo: { room: "資優教室1", judges: ["陳莉榛", "高琳茵"], type: "試教" },
       idv: { room: "資優教室2", judges: ["蘇一智", "王郁翔"], type: "口試" },
     },
-    candidates: ["01", "02", "03", "04", "05", "06", "07", "08", "16"],
+    candidates: ["01", "02", "03", "04", "05", "06", "07", "08", "09", "16", "17"],
   },
   subject_track: {
     name: "學科專長特區流水線",
@@ -40,7 +40,7 @@ const RUN_TRACKS = {
       demo: { room: "205教室", judges: ["鄭嘉琪", "廖人鋐"], type: "試教" },
       idv: { room: "206教室", judges: ["吳文瓊", "邱俊智"], type: "口試" },
     },
-    candidates: ["09", "10", "11", "12", "13", "14", "15", "17"],
+    candidates: ["10", "11", "12", "13", "14", "15"],
   },
 };
 
