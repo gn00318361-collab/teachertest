@@ -1,165 +1,102 @@
 :root {
-  --page-bg: #eef2f5;
-  --ink: #15202b;
-  --muted: #657386;
-  --line: #d8dee6;
-  --brand: #155e75;
-  --brand-deep: #0f3f4d;
+  --page-bg: #f1f5f9;
+  --ink: #0f172a;
+  --muted: #64748b;
+  --brand: #0284c7;
+  --brand-deep: #075985;
+  --success: #10b981;
+  --line: #e2e8f0;
 }
 
 body {
-  min-height: 100vh;
   background: var(--page-bg);
   color: var(--ink);
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft JhengHei", sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
 .topbar {
-  background: linear-gradient(120deg, var(--brand), var(--brand-deep));
-  color: #fff;
-  padding: 20px 0;
+  background: white;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--line);
 }
 
-.mode-bar,
-.candidate-nav,
-.surface,
-.candidate-focus,
-.score-panel,
-.admin-panel {
-  border-radius: 8px;
-}
-
-.mode-bar,
-.candidate-nav,
-.surface,
-.candidate-focus,
-.score-panel,
-.admin-panel {
-  background: #fff;
-  border: 1px solid var(--line);
-  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
-}
-
+/* 模式切換按鈕美化 */
 .mode-bar {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  padding: 10px;
+  background: #e2e8f0;
+  padding: 4px;
+  border-radius: 14px;
+  display: flex;
+}
+.mode-bar .btn {
+  flex: 1;
+  border: none;
+  border-radius: 10px;
+  padding: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  transition: all 0.2s;
+}
+.mode-bar .btn.active {
+  background: white !important;
+  color: var(--brand) !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
 
+/* 考生導航塊 */
 .candidate-nav {
-  display: grid;
-  grid-template-columns: 120px minmax(0, 1fr) 120px;
-  align-items: center;
-  gap: 12px;
-  padding: 14px;
+  background: linear-gradient(135deg, var(--brand-deep), var(--brand));
+  color: white;
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 0 10px 25px -5px rgba(2, 132, 199, 0.3);
 }
 
-.candidate-meter {
-  min-width: 0;
-  text-align: center;
-}
-
-.view-panel {
-  display: none;
-}
-
-.view-panel.active {
-  display: block;
-}
-
-.candidate-focus {
-  min-height: 390px;
-  display: grid;
-  align-items: center;
-  padding: clamp(20px, 4vw, 48px);
-}
-
-.candidate-number {
-  width: 86px;
-  height: 86px;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  background: #e7f5f8;
-  color: var(--brand-deep);
-  font-size: 2rem;
-  font-weight: 800;
-}
-
-.candidate-title {
-  font-size: clamp(2rem, 5vw, 4rem);
-  line-height: 1.1;
-}
-
-.meta-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-}
-
-.meta-box {
-  background: #f8fafc;
+/* 評分卡片 */
+.surface, .score-panel, .admin-panel {
+  background: white;
+  border-radius: 18px;
   border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 14px;
+  padding: 1.5rem;
 }
 
-.score-panel,
-.admin-panel {
-  padding: 18px;
-}
-
-.score-input-grid {
-  display: grid;
-  gap: 12px;
-}
-
+/* 分數輸入列 */
 .score-input-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 120px;
-  gap: 12px;
-  align-items: center;
-}
-
-.score-row {
   display: flex;
   justify-content: space-between;
-  gap: 12px;
-  padding: 10px 12px;
-  border-radius: 6px;
+  align-items: center;
+  padding: 1.25rem;
   background: #f8fafc;
-}
-
-.score-row + .score-row {
-  margin-top: 8px;
-}
-
-.progress-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 8px;
-}
-
-.progress-pill {
+  border-radius: 12px;
   border: 1px solid var(--line);
-  border-radius: 8px;
-  background: #fff;
-  padding: 10px;
+  margin-bottom: 0.75rem;
+}
+.score-input-row:focus-within {
+  background: white;
+  border-color: var(--brand);
+  box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.1);
 }
 
-@media (max-width: 767.98px) {
-  .candidate-nav {
-    grid-template-columns: 1fr 1fr;
-  }
+.item-score {
+  width: 100px;
+  height: 50px;
+  font-size: 1.75rem !important;
+  font-weight: 800;
+  text-align: center;
+  border: 2px solid var(--line);
+  border-radius: 10px;
+  color: var(--brand-deep);
+}
 
-  .candidate-meter {
-    grid-column: 1 / -1;
-    order: -1;
-  }
+.view-panel { display: none; }
+.view-panel.active { display: block; animation: fadeIn 0.3s ease-out; }
 
-  .meta-grid,
-  .score-input-row {
-    grid-template-columns: 1fr;
-  }
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* 列印隱藏 */
+@media print {
+  .topbar, .mode-bar, .candidate-nav, .btn { display: none !important; }
+  .view-panel { display: block !important; }
 }

@@ -4,76 +4,76 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>青溪國小代理代課教師甄試控制台</title>
+    <!-- 引入專業字體與 Bootstrap -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="today.css" />
   </head>
   <body>
     <header class="topbar">
       <div class="container-fluid px-3 px-lg-5">
-        <div class="d-flex flex-column flex-lg-row justify-content-between gap-3">
+        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-center gap-2">
           <div>
-            <h1 class="h4 fw-bold mb-1">桃園市桃園區青溪國民小學</h1>
-            <p class="mb-0">115學年度代理代課教師甄試｜單一考生評分控制台</p>
+            <h1 class="h4 fw-bold mb-0">青溪國民小學</h1>
+            <p class="mb-0 small opacity-75">115學年度代理代課教師甄試控制台</p>
           </div>
           <div class="d-flex flex-wrap gap-2 align-items-center">
-            <span id="liveClock" class="badge text-bg-dark px-3 py-2">載入時間中...</span>
-            <button id="resetThreeViews" class="btn btn-outline-light btn-sm fw-bold" type="button">清除本機暫存</button>
+            <span id="liveClock" class="badge bg-dark px-3 py-2">載入時間中...</span>
+            <button id="resetThreeViews" class="btn btn-outline-danger btn-sm" type="button">清除暫存</button>
           </div>
         </div>
       </div>
     </header>
 
-    <main class="container-fluid px-3 px-lg-5 py-3">
-      <section class="mode-bar mb-3">
-        <button class="btn btn-primary fw-bold view-button" data-view="candidate" type="button">考生</button>
-        <button class="btn btn-outline-success fw-bold view-button" data-view="judge" type="button">評分</button>
-        <button class="btn btn-outline-warning fw-bold view-button" data-view="admin" type="button">看板</button>
+    <main class="container-fluid px-3 px-lg-5 py-4">
+      <!-- 模式切換器 -->
+      <section class="mode-bar mb-4 shadow-sm">
+        <button class="btn view-button active" data-view="candidate" type="button">1. 考生資訊</button>
+        <button class="btn view-button" data-view="judge" type="button">2. 評審評分</button>
+        <button class="btn view-button" data-view="admin" type="button">3. 行政看板</button>
       </section>
 
-      <section class="candidate-nav mb-3">
-        <button id="prevCandidate" class="btn btn-outline-dark" type="button">上一位</button>
-        <div class="candidate-meter">
-          <div id="candidateCounter" class="small text-secondary">第 1 位 / 共 6 位</div>
+      <!-- 考生快速導航 -->
+      <section class="candidate-nav mb-4">
+        <button id="prevCandidate" class="btn btn-light shadow-sm" type="button">← 上一位</button>
+        <div class="candidate-meter text-center">
+          <div id="candidateCounter" class="small opacity-75 fw-bold text-uppercase">LOADING...</div>
           <div id="candidateNameBar" class="h3 fw-bold mb-0">載入中</div>
         </div>
-        <button id="nextCandidate" class="btn btn-dark" type="button">下一位</button>
+        <button id="nextCandidate" class="btn btn-light shadow-sm" type="button">下一位 →</button>
       </section>
 
-      <section id="candidateView" class="view-panel active" aria-labelledby="candidate-title">
-        <div id="candidateStage"></div>
-      </section>
-
-      <section id="judgeView" class="view-panel" aria-labelledby="judge-title">
-        <div class="surface mb-3">
+      <!-- 面板區 -->
+      <section id="candidateView" class="view-panel active"></section>
+      
+      <section id="judgeView" class="view-panel">
+        <div class="surface p-4 mb-4">
           <div class="row g-3 align-items-end">
             <div class="col-12 col-lg-4">
-              <label class="form-label fw-bold" for="judgeSelect">評審委員</label>
-              <select id="judgeSelect" class="form-select form-select-lg"></select>
+              <label class="form-label fw-bold text-primary" for="judgeSelect">● 評審委員身分驗證</label>
+              <select id="judgeSelect" class="form-select form-select-lg border-primary-subtle"></select>
             </div>
             <div class="col">
-              <h2 id="judge-title" class="h5 fw-bold mb-1">單一考生評分</h2>
-              <p class="mb-0 text-secondary">請確認目前考生，再填寫試教或口試分數。</p>
+              <p class="mb-0 text-muted small">※ 請先選擇委員姓名並輸入密碼後，方可開始評分。</p>
             </div>
           </div>
         </div>
         <div id="judgeStage"></div>
       </section>
 
-      <section id="adminView" class="view-panel" aria-labelledby="admin-title">
-        <div class="sync-panel bg-dark text-white p-3 mb-3">
-          <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
-            <div>
-              <h2 id="admin-title" class="h5 fw-bold mb-1">同步狀態</h2>
-              <p id="syncStatus" class="mb-0 text-white-50">正在準備同步資訊...</p>
-            </div>
-            <button id="forceSyncBtn" class="btn btn-outline-light btn-sm fw-bold" type="button">立即同步</button>
+      <section id="adminView" class="view-panel">
+        <div class="sync-panel bg-dark text-white p-3 rounded-4 mb-4 shadow d-flex justify-content-between align-items-center">
+          <div>
+            <div class="small opacity-75">雲端同步狀態</div>
+            <div id="syncStatus" class="fw-bold">正在讀取最新紀錄...</div>
           </div>
+          <button id="forceSyncBtn" class="btn btn-outline-light btn-sm fw-bold">手動更新看板</button>
         </div>
         <div id="adminStage"></div>
       </section>
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="today.js?v=one-candidate-v1"></script>
+    <script src="today.js?v=2.0"></script>
   </body>
 </html>
