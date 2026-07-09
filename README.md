@@ -60,7 +60,7 @@
 
 控制台送出的成績會透過 `API_URL` 即時寫入您最新佈署的 Google Apps Script 網頁應用程式：
 ```javascript
-const API_URL = "https://script.google.com/macros/s/AKfycbzur3hBvwvh9RFvyqwudh8510TU3I_KQVutL9jkzuc99e1Z_dsADn5lf9Co7uQNRU1J/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbwiEVsyFlYmYWkn7TWLNzcM65U7i6w0KKy-quo1DIOb7PzfezNJ9BFQGtWiS8BkDWfm3w/exec";
 ```
 * **本機備援**：若現場網路不穩，分數仍會保留在瀏覽器的 LocalStorage 暫存區（重整也不會遺失）。
 

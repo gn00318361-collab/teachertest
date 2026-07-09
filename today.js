@@ -1,4 +1,4 @@
-const API_URL = "https://script.google.com/macros/s/AKfycbzur3hBvwvh9RFvyqwudh8510TU3I_KQVutL9jkzuc99e1Z_dsADn5lf9Co7uQNRU1J/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbwiEVsyFlYmYWkn7TWLNzcM65U7i6w0KKy-quo1DIOb7PzfezNJ9BFQGtWiS8BkDWfm3w/exec";
 const STORAGE_KEY = "qxes-subteacher-score-console-1150708-v1";
 const LOCAL_SCORES_KEY = "qxes-subteacher-score-console-1150708-local-scores-v1";
 const CONFIG_PASSWORD = "csps";
