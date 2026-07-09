@@ -29,7 +29,7 @@ const RUN_TRACKS = {
   gifted_track: {
     name: "資優班特區流水線",
     stages: {
-      demo: { room: "資優教室1", judges: ["邱俊智", "高琳茵"], type: "試教" },
+      demo: { room: "資優教室1", judges: ["陳莉榛", "高琳茵"], type: "試教" },
       idv: { room: "資優教室2", judges: ["蘇一智", "王郁翔"], type: "口試" },
     },
     candidates: ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "13"],
@@ -37,7 +37,7 @@ const RUN_TRACKS = {
   subject_track: {
     name: "學科專長特區流水線",
     stages: {
-      demo: { room: "206教室", judges: ["吳文瓊", "陳莉榛"], type: "試教" },
+      demo: { room: "206教室", judges: ["吳文瓊", "邱俊智"], type: "試教" },
       idv: { room: "205教室", judges: ["鄭嘉琪", "廖人鋐"], type: "口試" },
     },
     candidates: ["11", "12", "14", "15", "16", "17"],
