@@ -61,7 +61,7 @@ GitHub Pages 會自動讀取 `index.html` 作為首頁。
 `today.js` 內已設定 Apps Script Web App URL：
 
 ```javascript
-const API_URL = "https://script.google.com/macros/s/AKfycby9v87cRPksXV5pvIhEXbZxvCE_L69JI06aQ26wMeX3vZCou2MiijkP9z0V8K9ONFga2g/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbx_tMdBueAo-6mLgoAdVA9c35ViQzPFXdtMnVF8X6otPGDfJFQiAH7v5pxYF_SPfOQ/exec";
 ```
 
 送出的資料欄位：
