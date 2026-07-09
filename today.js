@@ -32,15 +32,15 @@ const RUN_TRACKS = {
       demo: { room: "資優教室1", judges: ["陳莉榛", "高琳茵"], type: "試教" },
       idv: { room: "資優教室2", judges: ["蘇一智", "王郁翔"], type: "口試" },
     },
-    candidates: ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "13"],
+    candidates: ["01", "02", "03", "04", "05", "06", "07", "08", "16"],
   },
   subject_track: {
     name: "學科專長特區流水線",
     stages: {
-      demo: { room: "206教室", judges: ["吳文瓊", "邱俊智"], type: "試教" },
-      idv: { room: "205教室", judges: ["鄭嘉琪", "廖人鋐"], type: "口試" },
+      demo: { room: "206教室", judges: ["鄭嘉琪", "廖人鋐"], type: "試教" },
+      idv: { room: "205教室", judges: ["吳文瓊", "邱俊智"], type: "口試" },
     },
-    candidates: ["11", "12", "14", "15", "16", "17"],
+    candidates: ["09", "10", "11", "12", "13", "14", "15", "17"],
   },
 };
 
@@ -593,65 +593,79 @@ function renderPrintArea() {
   const printEl = document.querySelector("#printArea");
   if (!printEl) return;
   
-  const rowsHtml = candidates.map((c, index) => {
-    const track = RUN_TRACKS[c.trackKey];
-    return `
-      <tr>
-        <td>${index + 1}</td>
-        <td class="fw-bold">${c.no}</td>
-        <td>${c.name}</td>
-        <td>${c.schedule.teaching.time}</td>
-        <td>${c.schedule.teaching.room}</td>
-        <td class="signature-box">
-          <div class="small text-muted text-start" style="font-size: 7.5pt; border-bottom: 1px dotted #ccc; padding-bottom: 6px;">
-            1. ${track.stages.demo.judges[0]}:
-          </div>
-          <div class="small text-muted text-start" style="font-size: 7.5pt; padding-top: 2px;">
-            2. ${track.stages.demo.judges[1]}:
-          </div>
-        </td>
-        <td>${c.schedule.oral.time}</td>
-        <td>${c.schedule.oral.room}</td>
-        <td class="signature-box">
-          <div class="small text-muted text-start" style="font-size: 7.5pt; border-bottom: 1px dotted #ccc; padding-bottom: 6px;">
-            1. ${track.stages.idv.judges[0]}:
-          </div>
-          <div class="small text-muted text-start" style="font-size: 7.5pt; padding-top: 2px;">
-            2. ${track.stages.idv.judges[1]}:
-          </div>
-        </td>
-        <td></td>
-      </tr>
-    `;
-  }).join("");
-  
-  printEl.innerHTML = `
-    <div class="print-title">桃園市桃園區青溪國民小學 115 學年度第 3 次招考第 1 次代理代課教師甄試數位評分控制台</div>
-    <div class="print-subtitle">甄試流水線排程暨委員簽名確認表 (列印時間：${new Date().toLocaleString()})</div>
-    <table class="print-table">
-      <thead>
+  const generateSectionHtml = (trackKey, subtitle) => {
+    const trackCandidates = candidates.filter(c => c.trackKey === trackKey);
+    const rowsHtml = trackCandidates.map((c, index) => {
+      const track = RUN_TRACKS[c.trackKey];
+      return `
         <tr>
-          <th style="width: 4%;">序</th>
-          <th style="width: 7%;">考生編號</th>
-          <th style="width: 9%;">考生姓名</th>
-          <th style="width: 10%;">試教時間</th>
-          <th style="width: 10%;">試教教室</th>
-          <th style="width: 20%;">試教評審委員簽名</th>
-          <th style="width: 10%;">口試時間</th>
-          <th style="width: 10%;">口試教室</th>
-          <th style="width: 20%;">口試評審委員簽名</th>
-          <th style="width: 10%;">備註</th>
+          <td>${index + 1}</td>
+          <td class="fw-bold">${c.no}</td>
+          <td>${c.name}</td>
+          <td>${c.schedule.teaching.time}</td>
+          <td>${c.schedule.teaching.room}</td>
+          <td class="signature-box">
+            <div class="small text-muted text-start" style="font-size: 7.5pt; border-bottom: 1px dotted #ccc; padding-bottom: 6px;">
+              1. ${track.stages.demo.judges[0]}:
+            </div>
+            <div class="small text-muted text-start" style="font-size: 7.5pt; padding-top: 2px;">
+              2. ${track.stages.demo.judges[1]}:
+            </div>
+          </td>
+          <td>${c.schedule.oral.time}</td>
+          <td>${c.schedule.oral.room}</td>
+          <td class="signature-box">
+            <div class="small text-muted text-start" style="font-size: 7.5pt; border-bottom: 1px dotted #ccc; padding-bottom: 6px;">
+              1. ${track.stages.idv.judges[0]}:
+            </div>
+            <div class="small text-muted text-start" style="font-size: 7.5pt; padding-top: 2px;">
+              2. ${track.stages.idv.judges[1]}:
+            </div>
+          </td>
+          <td></td>
         </tr>
-      </thead>
-      <tbody>
-        ${rowsHtml}
-      </tbody>
-    </table>
-    <div class="print-footer">
-      <span>承辦人：__________________</span>
-      <span>輔導主任：__________________</span>
-      <span>校長：__________________</span>
-    </div>
+      `;
+    }).join("");
+
+    return `
+      <div class="print-section">
+        <div class="print-title">桃園市桃園區青溪國民小學 115 學年度第 3 次招考第 1 次代理代課教師甄試</div>
+        <div class="print-subtitle">${subtitle} 流水線排程暨委員簽名確認表 (列印時間：${new Date().toLocaleString()})</div>
+        <table class="print-table">
+          <thead>
+            <tr>
+              <th style="width: 4%;">序</th>
+              <th style="width: 7%;">考生編號</th>
+              <th style="width: 9%;">考生姓名</th>
+              <th style="width: 10%;">試教時間</th>
+              <th style="width: 10%;">試教教室</th>
+              <th style="width: 20%;">試教評審委員簽名</th>
+              <th style="width: 10%;">口試時間</th>
+              <th style="width: 10%;">口試教室</th>
+              <th style="width: 20%;">口試評審委員簽名</th>
+              <th style="width: 10%;">備註</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rowsHtml}
+          </tbody>
+        </table>
+        <div class="print-footer">
+          <span>承辦人：__________________</span>
+          <span>輔導主任：__________________</span>
+          <span>校長：__________________</span>
+        </div>
+      </div>
+    `;
+  };
+
+  const giftedHtml = generateSectionHtml("gifted_track", "🏛️ 資優班教室區 (試教: 資優教室1 / 口試: 資優教室2)");
+  const subjectHtml = generateSectionHtml("subject_track", "🚪 二年級教室區 (試教: 206教室 / 口試: 205教室)");
+
+  printEl.innerHTML = `
+    ${giftedHtml}
+    <div style="page-break-before: always;"></div>
+    ${subjectHtml}
   `;
 }
 
