@@ -46,8 +46,6 @@ const RUN_TRACKS = {
 
 const START_TIME_STR = "09:00";
 const STAGE_DURATION = 10;
-const BUFFER_DURATION = 5;
-const TIME_STEP = STAGE_DURATION + BUFFER_DURATION;
 
 const scoreTypes = {
   teaching: { label: "試教評分", max: [25, 25, 20, 20, 10], items: ["教學內容", "教學技巧", "教案設計", "表達能力", "儀容舉止"] },
@@ -64,25 +62,78 @@ function addMinutes(timeStr, mins) {
 
 function generatePipelineSchedule() {
   const scheduleResult = {};
+  
+  const trackMapping = {
+    gifted_track: [
+      { no: "01", type: "demo_first", groupIndex: 0 },
+      { no: "02", type: "demo_first", groupIndex: 1 },
+      { no: "03", type: "demo_first", groupIndex: 2 },
+      { no: "04", type: "oral_first", groupIndex: 0 },
+      { no: "05", type: "oral_first", groupIndex: 1 },
+      { no: "06", type: "oral_first", groupIndex: 2 },
+      { no: "07", type: "demo_first", groupIndex: 3 },
+      { no: "08", type: "oral_first", groupIndex: 3 },
+      { no: "09", type: "demo_first", groupIndex: 4 }
+    ],
+    subject_track: [
+      { no: "10", type: "demo_first", groupIndex: 0 },
+      { no: "11", type: "demo_first", groupIndex: 1 },
+      { no: "12", type: "demo_first", groupIndex: 2 },
+      { no: "13", type: "oral_first", groupIndex: 0 },
+      { no: "14", type: "oral_first", groupIndex: 1 },
+      { no: "15", type: "oral_first", groupIndex: 2 },
+      { no: "16", type: "demo_first", groupIndex: 3 },
+      { no: "17", type: "oral_first", groupIndex: 3 }
+    ]
+  };
+
   Object.keys(RUN_TRACKS).forEach((trackKey) => {
     const track = RUN_TRACKS[trackKey];
     scheduleResult[trackKey] = [];
-    track.candidates.forEach((candidateNo, index) => {
-      const demoStartTime = addMinutes(START_TIME_STR, index * TIME_STEP);
-      const demoEndTime = addMinutes(demoStartTime, STAGE_DURATION);
-      const idvStartTime = addMinutes(demoStartTime, TIME_STEP);
-      const idvEndTime = addMinutes(idvStartTime, STAGE_DURATION);
+    
+    const mappings = trackMapping[trackKey];
+    mappings.forEach((m) => {
+      let demoSlotIndex, oralSlotIndex;
       
-      const reg = CANDIDATE_REGISTRY[candidateNo];
-      const candidateName = reg ? reg.name : `考生${candidateNo}`;
+      if (m.type === "demo_first") {
+        if (m.groupIndex < 3) {
+          demoSlotIndex = m.groupIndex;
+          oralSlotIndex = m.groupIndex + 3;
+        } else if (m.groupIndex === 3) {
+          demoSlotIndex = 6;
+          oralSlotIndex = 7;
+        } else {
+          demoSlotIndex = 8;
+          oralSlotIndex = 9;
+        }
+      } else {
+        if (m.groupIndex < 3) {
+          oralSlotIndex = m.groupIndex;
+          demoSlotIndex = m.groupIndex + 3;
+        } else {
+          oralSlotIndex = 6;
+          demoSlotIndex = 7;
+        }
+      }
+      
+      const demoStartTime = addMinutes(START_TIME_STR, demoSlotIndex * STAGE_DURATION);
+      const demoEndTime = addMinutes(demoStartTime, STAGE_DURATION);
+      const oralStartTime = addMinutes(START_TIME_STR, oralSlotIndex * STAGE_DURATION);
+      const oralEndTime = addMinutes(oralStartTime, STAGE_DURATION);
+      
+      const reg = CANDIDATE_REGISTRY[m.no];
+      const candidateName = reg ? reg.name : `考生${m.no}`;
       
       scheduleResult[trackKey].push({
-        candidateNo, candidateName,
+        candidateNo: m.no, candidateName,
         demo: { room: track.stages.demo.room, timeRange: `${demoStartTime}-${demoEndTime}` },
-        idv: { room: track.stages.idv.room, timeRange: `${idvStartTime}-${idvEndTime}` },
+        idv: { room: track.stages.idv.room, timeRange: `${oralStartTime}-${oralEndTime}` },
       });
     });
+    
+    scheduleResult[trackKey].sort((a, b) => a.candidateNo.localeCompare(b.candidateNo));
   });
+  
   return scheduleResult;
 }
 
