@@ -3,7 +3,7 @@ const STORAGE_KEY = "qxes-subteacher-score-console-1150708-v1";
 const LOCAL_SCORES_KEY = "qxes-subteacher-score-console-1150708-local-scores-v1";
 const CONFIG_PASSWORD = "csps";
 
-const JUDGES = ["邱俊智", "陳莉榛", "預備評審", "張嘉琪", "鄭嘉琪", "吳文瓊", "高琳茵", "王郁翔"];
+const JUDGES = ["邱俊智", "陳莉榛", "郭義賢", "張嘉琪", "鄭嘉琪", "吳文瓊", "高琳茵", "王郁翔"];
 
 const CANDIDATE_REGISTRY = {
   "01": { name: "梅宸葳", category: "一般代理", subject: "導師" },
@@ -37,7 +37,7 @@ const RUN_TRACKS = {
   subject_track: {
     name: "學科專長特區流水線",
     stages: {
-      demo: { room: "205教室", judges: ["鄭嘉琪", "預備評審"], type: "試教" },
+      demo: { room: "205教室", judges: ["鄭嘉琪", "郭義賢"], type: "試教" },
       idv: { room: "206教室", judges: ["吳文瓊", "邱俊智"], type: "口試" },
     },
     candidates: ["10", "11", "12", "13", "14", "15", "16", "17"],
